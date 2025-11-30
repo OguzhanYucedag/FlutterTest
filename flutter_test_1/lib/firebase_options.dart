@@ -41,46 +41,49 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'YOUR_WEB_API_KEY',
-    appId: '1:YOUR_APP_ID:web:YOUR_WEB_APP_ID',
-    messagingSenderId: 'YOUR_SENDER_ID',
+    apiKey: 'AIzaSyAdJHMrj7t7IuZBEH4nwQqvwT-PFweDQ6U',
+    appId: '1:73693772352:web:155ea5dfb490924265bda5',
+    messagingSenderId: '73693772352',
     projectId: 'test-16718',
     authDomain: 'test-16718.firebaseapp.com',
-    storageBucket: 'test-16718.appspot.com',
+    storageBucket: 'test-16718.firebasestorage.app',
+    measurementId: 'G-MK12KZ4MY8',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'YOUR_ANDROID_API_KEY',
-    appId: '1:YOUR_APP_ID:android:YOUR_ANDROID_APP_ID',
-    messagingSenderId: 'YOUR_SENDER_ID',
+    apiKey: 'AIzaSyBPAdlFsePaW433Gzwos71EdnuMJujeAmc',
+    appId: '1:73693772352:android:6c731c09d3c5d16f65bda5',
+    messagingSenderId: '73693772352',
     projectId: 'test-16718',
-    storageBucket: 'test-16718.appspot.com',
+    storageBucket: 'test-16718.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'YOUR_IOS_API_KEY',
-    appId: '1:YOUR_APP_ID:ios:YOUR_IOS_APP_ID',
-    messagingSenderId: 'YOUR_SENDER_ID',
+    apiKey: 'AIzaSyCAjfipZ7pROD7QKk_HKWSy9CVp09rHjW0',
+    appId: '1:73693772352:ios:1365dc827a781ab465bda5',
+    messagingSenderId: '73693772352',
     projectId: 'test-16718',
-    storageBucket: 'test-16718.appspot.com',
+    storageBucket: 'test-16718.firebasestorage.app',
     iosBundleId: 'com.example.flutterTest1',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'YOUR_MACOS_API_KEY',
-    appId: '1:YOUR_APP_ID:macos:YOUR_MACOS_APP_ID',
-    messagingSenderId: 'YOUR_SENDER_ID',
+    apiKey: 'AIzaSyCAjfipZ7pROD7QKk_HKWSy9CVp09rHjW0',
+    appId: '1:73693772352:ios:1365dc827a781ab465bda5',
+    messagingSenderId: '73693772352',
     projectId: 'test-16718',
-    storageBucket: 'test-16718.appspot.com',
+    storageBucket: 'test-16718.firebasestorage.app',
     iosBundleId: 'com.example.flutterTest1',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
-    apiKey: 'YOUR_WINDOWS_API_KEY',
-    appId: '1:YOUR_APP_ID:windows:YOUR_WINDOWS_APP_ID',
-    messagingSenderId: 'YOUR_SENDER_ID',
+    apiKey: 'AIzaSyAdJHMrj7t7IuZBEH4nwQqvwT-PFweDQ6U',
+    appId: '1:73693772352:web:94bbe6a9a25c7a1965bda5',
+    messagingSenderId: '73693772352',
     projectId: 'test-16718',
-    storageBucket: 'test-16718.appspot.com',
+    authDomain: 'test-16718.firebaseapp.com',
+    storageBucket: 'test-16718.firebasestorage.app',
+    measurementId: 'G-KLGE4YETEN',
   );
-}
 
+}

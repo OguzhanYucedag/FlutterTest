@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'firebase_options.dart';
+import 'kayit.dart';
+import 'anasayfa.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -42,6 +45,80 @@ class _LoginPageState extends State<LoginPage> {
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
+  }
+
+  Future<void> _handleLogin() async {
+    // Validate fields
+    if (_emailController.text.trim().isEmpty) {
+      _showErrorSnackBar('Lütfen Email giriniz');
+      return;
+    }
+
+    if (_passwordController.text.isEmpty) {
+      _showErrorSnackBar('Lütfen Şifre giriniz');
+      return;
+    }
+
+    try {
+      // Sign in with Firebase Authentication
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: _emailController.text.trim(),
+        password: _passwordController.text,
+      );
+
+      // Show success message
+      _showSuccessSnackBar('Giriş başarılı!');
+
+      // Navigate to home page
+      if (mounted) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const AnasayfaPage()),
+        );
+      }
+    } on FirebaseAuthException catch (e) {
+      String errorMessage = 'Giriş işlemi başarısız oldu';
+      if (e.code == 'user-not-found') {
+        errorMessage = 'Böyle bir hesap bulunamadı';
+      } else if (e.code == 'wrong-password') {
+        errorMessage = 'Şifre yanlış';
+      } else if (e.code == 'invalid-email') {
+        errorMessage = 'Geçersiz email adresi';
+      } else if (e.code == 'user-disabled') {
+        errorMessage = 'Bu hesap devre dışı bırakılmış';
+      } else if (e.code == 'too-many-requests') {
+        errorMessage = 'Çok fazla deneme yapıldı. Lütfen daha sonra tekrar deneyin.';
+      } else if (e.code == 'network-request-failed') {
+        errorMessage = 'İnternet bağlantısı hatası. Lütfen kontrol edin.';
+      } else {
+        errorMessage = 'Hata: ${e.code} - ${e.message ?? "Bilinmeyen hata"}';
+      }
+      _showErrorSnackBar(errorMessage);
+    } catch (e) {
+      _showErrorSnackBar('Bir hata oluştu: ${e.toString()}');
+    }
+  }
+
+  void _showSuccessSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.green[300], // Açık yeşil
+        behavior: SnackBarBehavior.floating,
+        duration: const Duration(seconds: 3),
+      ),
+    );
+  }
+
+  void _showErrorSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.red[300],
+        behavior: SnackBarBehavior.floating,
+        duration: const Duration(seconds: 3),
+      ),
+    );
   }
 
   @override
@@ -127,7 +204,10 @@ class _LoginPageState extends State<LoginPage> {
                   color: Colors.white,
                   child: OutlinedButton(
                     onPressed: () {
-                      // Handle registration
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const KayitPage()),
+                      );
                     },
                     style: OutlinedButton.styleFrom(
                       side: const BorderSide(color: Colors.black),
@@ -169,8 +249,8 @@ class _LoginPageState extends State<LoginPage> {
                 child: Material(
                   color: Colors.transparent,
                   child: InkWell(
-                    onTap: () {
-                      // Handle login
+                    onTap: () async {
+                      await _handleLogin();
                     },
                     borderRadius: BorderRadius.circular(32),
                     child: Container(
