@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class KayitPage extends StatefulWidget {
@@ -8,9 +9,7 @@ class KayitPage extends StatefulWidget {
 }
 
 class _KayitPageState extends State<KayitPage> {
-  
-
-  late String ad, sifre, email;
+  String ad = '', sifre = '', email = '';
 
   adAl(adTutucu) {
     this.ad = adTutucu;
@@ -154,31 +153,30 @@ class _KayitPageState extends State<KayitPage> {
                   // Birinci Buton (Kurum)
                   Expanded(
                     child: Material(
-                      color: _selectedOption == 0 ? const Color.fromARGB(255, 96, 96, 96) : Colors.transparent,
+                      color: _selectedOption == 0
+                          ? const Color.fromARGB(255, 96, 96, 96)
+                          : Colors.transparent,
                       borderRadius: BorderRadius.circular(32),
                       child: InkWell(
                         onTap: () {
-
                           setState(() {
                             _selectedOption = 0;
                           });
-                           
                         },
                         borderRadius: BorderRadius.circular(32),
                         child: Container(
                           padding: const EdgeInsets.symmetric(vertical: 12),
                           decoration: BoxDecoration(
-                            border: Border.all(
-                              color: Colors.black,
-                              width: 1.5,
-                            ),
+                            border: Border.all(color: Colors.black, width: 1.5),
                             borderRadius: BorderRadius.circular(32),
                           ),
                           alignment: Alignment.center,
                           child: Text(
                             'Kurum Kaydı',
                             style: TextStyle(
-                              color: _selectedOption == 0 ? Colors.white : Colors.black,
+                              color: _selectedOption == 0
+                                  ? Colors.white
+                                  : Colors.black,
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
                             ),
@@ -191,7 +189,9 @@ class _KayitPageState extends State<KayitPage> {
                   // İkinci Buton (Veli)
                   Expanded(
                     child: Material(
-                      color: _selectedOption == 1 ? const Color.fromARGB(255, 96, 96, 96) : Colors.transparent,
+                      color: _selectedOption == 1
+                          ? const Color.fromARGB(255, 96, 96, 96)
+                          : Colors.transparent,
                       borderRadius: BorderRadius.circular(32),
                       child: InkWell(
                         onTap: () {
@@ -210,7 +210,9 @@ class _KayitPageState extends State<KayitPage> {
                           child: Text(
                             'Veli Kaydı',
                             style: TextStyle(
-                              color: _selectedOption == 1 ? Colors.white : Colors.black,
+                              color: _selectedOption == 1
+                                  ? Colors.white
+                                  : Colors.black,
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
                             ),
@@ -240,7 +242,7 @@ class _KayitPageState extends State<KayitPage> {
                 child: Material(
                   color: Colors.transparent,
                   child: InkWell(
-                    onTap: ()  {
+                    onTap: () {
                       //Kayıt Butonu İşlevi
                     },
                     borderRadius: BorderRadius.circular(32),
@@ -266,22 +268,35 @@ class _KayitPageState extends State<KayitPage> {
     );
   }
 
-  void veriEkle() {
-    //veri ekleme yolu
-    // DocumentReference veriYolu = FirebaseFirestore.instance
-    //     .collection("Kurum")
-    //     .doc(id);
+  Future<void> veriEkle() async {
+    if (ad.isEmpty || email.isEmpty || sifre.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Lütfen tüm alanları doldurun')),
+      );
+      return;
+    }
 
-    //Çoklu Veri için map
-    Map<String, dynamic> kurumlar = {
+    final String collection = _selectedOption == 0 ? 'Kurum' : 'Veli';
+
+    final Map<String, dynamic> kurumlar = {
       "kurumAd": ad,
       "kurumEmail": email,
       "kurumŞifre": sifre,
+      "tip": collection.toLowerCase(),
+      "olusturmaZamani": FieldValue.serverTimestamp(),
     };
 
-    //veriyi veri tabanına ekle
-    // veriYolu.set(kurumlar).whenComplete(() {
-    //   Fluttertoast.showToast(msg: id + "ID'li kurum eklendi");
-    // });
+    try {
+      await FirebaseFirestore.instance.collection(collection).add(kurumlar);
+      if (!mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Kayıt başarıyla eklendi')));
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Kayıt eklenemedi: $e')));
+    }
   }
 }

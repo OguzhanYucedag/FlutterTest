@@ -1,17 +1,11 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'firebase_options.dart';
 import 'kayit.dart';
-import 'anasayfa.dart';
-
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    // options: DefaultFirebaseOptions.currentPlatform,
-  );
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(const MyApp());
 }
 
@@ -42,7 +36,7 @@ class _LoginPageState extends State<LoginPage> {
   // final TextEditingController _passwordController = TextEditingController();
   // bool _obscurePassword = true;
   // String ad, email, sifre;
-  
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -75,7 +69,6 @@ class _LoginPageState extends State<LoginPage> {
 
               // Email field
               TextField(
-                
                 // controller: _emailController,
                 decoration: const InputDecoration(
                   labelText: 'Email',
@@ -93,7 +86,6 @@ class _LoginPageState extends State<LoginPage> {
 
               // Password field
               TextField(
-                
                 // controller: _passwordController,
                 // obscureText: _obscurePassword,
                 decoration: InputDecoration(
@@ -197,6 +189,4 @@ class _LoginPageState extends State<LoginPage> {
       ),
     );
   }
-
-  
 }
