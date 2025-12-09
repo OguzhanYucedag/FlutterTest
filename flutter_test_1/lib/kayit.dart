@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'anasayfa.dart';
+import 'main.dart';
 
 class KayitPage extends StatefulWidget {
   const KayitPage({super.key});
@@ -10,7 +10,7 @@ class KayitPage extends StatefulWidget {
 }
 
 class _KayitPageState extends State<KayitPage> {
-  String ad = '', sifre = '', email = '';
+  String ad = '', sifre = '', email = '', sifreTekrar = '';
 
   // Değiştirilebilir hale getirildi
   bool _obscurePassword = true;
@@ -115,6 +115,9 @@ class _KayitPageState extends State<KayitPage> {
 
               // Şifre Tekrar
               TextField(
+                onChanged: (value) {
+                  sifreTekrar = value;
+                },
                 obscureText: _obscureConfirmPassword,
                 decoration: InputDecoration(
                   labelText: 'Şifre Tekrar',
@@ -258,14 +261,23 @@ class _KayitPageState extends State<KayitPage> {
       return;
     }
 
-    final String collection = _selectedOption == 0 ? 'Kurum' : 'Veli';
+    if (sifre != sifreTekrar) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Şifreler eşleşmiyor')));
+      return;
+    }
+
+    const String collection = 'users';
+    final String adEtiketi = _selectedOption == 0 ? 'kurum adı' : 'veli adı';
+    final String tip = _selectedOption == 0 ? 'kurum' : 'veli';
 
     final bool adKayitli = await _kayitVarMi(collection, 'kurumAd', ad);
     if (adKayitli) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Bu kurum adı zaten kayıtlı')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Bu $adEtiketi zaten kayıtlı')));
       return;
     }
 
@@ -286,7 +298,7 @@ class _KayitPageState extends State<KayitPage> {
       "kurumAd": ad,
       "kurumEmail": email,
       "kurumŞifre": sifre,
-      "tip": collection.toLowerCase(),
+      "tip": tip,
       "olusturmaZamani": FieldValue.serverTimestamp(),
     };
 
@@ -298,9 +310,10 @@ class _KayitPageState extends State<KayitPage> {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Kayıt başarıyla eklendi')),
           );
-          Navigator.pushReplacement(
+          Navigator.pushAndRemoveUntil(
             context,
-            MaterialPageRoute(builder: (context) => const AnasayfaPage()),
+            MaterialPageRoute(builder: (context) => const MyApp()),
+            (route) => false,
           );
         })
         .catchError((e) {

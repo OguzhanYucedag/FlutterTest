@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'firebase_options.dart';
 import 'kayit.dart';
+import 'anasayfa.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -32,10 +34,16 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  // final TextEditingController _emailController = TextEditingController();
-  // final TextEditingController _passwordController = TextEditingController();
-  // bool _obscurePassword = true;
-  // String ad, email, sifre;
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  bool _obscurePassword = true;
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -69,7 +77,7 @@ class _LoginPageState extends State<LoginPage> {
 
               // Email field
               TextField(
-                // controller: _emailController,
+                controller: _emailController,
                 decoration: const InputDecoration(
                   labelText: 'Email',
                   labelStyle: TextStyle(color: Colors.grey),
@@ -86,8 +94,8 @@ class _LoginPageState extends State<LoginPage> {
 
               // Password field
               TextField(
-                // controller: _passwordController,
-                // obscureText: _obscurePassword,
+                controller: _passwordController,
+                obscureText: _obscurePassword,
                 decoration: InputDecoration(
                   labelText: 'Şifre',
                   labelStyle: const TextStyle(color: Colors.grey),
@@ -97,17 +105,19 @@ class _LoginPageState extends State<LoginPage> {
                   focusedBorder: const UnderlineInputBorder(
                     borderSide: BorderSide(color: Colors.black),
                   ),
-                  // suffixIcon: IconButton(
-                  //   icon: Icon(
-                  //      _obscurePassword  ? Icons.visibility_off : Icons.visibility,
-                  //      color: Colors.grey,
-                  //   ),
-                  //   onPressed: () {
-                  //     // setState(() {
-                  //     //   _obscurePassword = !_obscurePassword;
-                  //     // });
-                  //   },
-                  // ),
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      _obscurePassword
+                          ? Icons.visibility_off
+                          : Icons.visibility,
+                      color: Colors.grey,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _obscurePassword = !_obscurePassword;
+                      });
+                    },
+                  ),
                 ),
               ),
               const SizedBox(height: 24),
@@ -147,39 +157,24 @@ class _LoginPageState extends State<LoginPage> {
 
               const Spacer(),
 
-              // Giriş Yap button
-              Container(
+              // Giriş Yap button (ElevatedButton ile aynı tasarım)
+              SizedBox(
                 width: double.infinity,
-                decoration: BoxDecoration(
-                  color: Colors.black,
-                  borderRadius: BorderRadius.circular(32),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.3),
-                      blurRadius: 8,
-                      offset: const Offset(0, 4),
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.black,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 18),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(32),
                     ),
-                  ],
-                ),
-                child: Material(
-                  color: Colors.transparent,
-                  child: InkWell(
-                    onTap: () async {
-                      //Giriş Yap Butonuna Tıklandığında
-                    },
-                    borderRadius: BorderRadius.circular(32),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: 18),
-                      alignment: Alignment.center,
-                      child: const Text(
-                        'Giriş Yap',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
+                    elevation: 4,
+                    shadowColor: Colors.black.withValues(alpha: 0.3),
+                  ),
+                  onPressed: _girisYap,
+                  child: const Text(
+                    'Giriş Yap',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                 ),
               ),
@@ -188,5 +183,43 @@ class _LoginPageState extends State<LoginPage> {
         ),
       ),
     );
+  }
+
+  Future<void> _girisYap() async {
+    final email = _emailController.text.trim();
+    final sifre = _passwordController.text.trim();
+
+    if (email.isEmpty || sifre.isEmpty) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Email ve şifre giriniz')));
+      return;
+    }
+
+    final sorgu = await FirebaseFirestore.instance
+        .collection('users')
+        .where('kurumEmail', isEqualTo: email)
+        .where('kurumŞifre', isEqualTo: sifre)
+        .limit(1)
+        .get();
+
+    if (sorgu.docs.isNotEmpty) {
+      final veri = sorgu.docs.first.data();
+      final String ad = veri['kurumAd'] ?? '';
+      final String tip = veri['tip'] ?? '';
+
+      if (!mounted) return;
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => AnasayfaPage(ad: ad, email: email, tip: tip),
+        ),
+      );
+    } else {
+      if (!mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Email veya şifre hatalı')));
+    }
   }
 }
