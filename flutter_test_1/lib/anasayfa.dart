@@ -76,3 +76,4 @@ class AnasayfaPageKurum extends StatelessWidget {
     );
   }
 }
+//najsfasıfıasfasuısajfoasnfjasfnjın
