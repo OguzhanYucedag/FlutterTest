@@ -225,38 +225,27 @@ class _KayitPageState extends State<KayitPage> {
               ),
               const SizedBox(height: 24),
 
-              // Kayıt Ol Butonu
-              Container(
+              // Kayıt Ol Butonu (ElevatedButton)
+              SizedBox(
                 width: double.infinity,
-                decoration: BoxDecoration(
-                  color: Colors.black,
-                  borderRadius: BorderRadius.circular(32),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.3),
-                      blurRadius: 8,
-                      offset: const Offset(0, 4),
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.black,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(32),
                     ),
-                  ],
-                ),
-                child: Material(
-                  color: Colors.transparent,
-                  child: InkWell(
-                    onTap: () {
-                      //Kayıt Butonu İşlevi
-                    },
-                    borderRadius: BorderRadius.circular(32),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: 18),
-                      alignment: Alignment.center,
-                      child: const Text(
-                        'Kayıt Ol',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
+                    padding: const EdgeInsets.symmetric(vertical: 18),
+                    elevation: 4,
+                  ),
+                  onPressed: () {
+                    veriEkle();
+                  },
+                  child: const Text(
+                    'Kayıt Ol',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
                 ),
@@ -286,17 +275,20 @@ class _KayitPageState extends State<KayitPage> {
       "olusturmaZamani": FieldValue.serverTimestamp(),
     };
 
-    try {
-      await FirebaseFirestore.instance.collection(collection).add(kurumlar);
-      if (!mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Kayıt başarıyla eklendi')));
-    } catch (e) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Kayıt eklenemedi: $e')));
-    }
+    FirebaseFirestore.instance
+        .collection(collection)
+        .add(kurumlar)
+        .then((_) {
+          if (!mounted) return;
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Kayıt başarıyla eklendi')),
+          );
+        })
+        .catchError((e) {
+          if (!mounted) return;
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text('Kayıt eklenemedi: $e')));
+        });
   }
 }
