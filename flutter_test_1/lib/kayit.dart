@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'anasayfa.dart';
 
 class KayitPage extends StatefulWidget {
   const KayitPage({super.key});
@@ -133,8 +134,7 @@ class _KayitPageState extends State<KayitPage> {
                     ),
                     onPressed: () {
                       setState(() {
-                        _obscureConfirmPassword =
-                            !_obscureConfirmPassword;
+                        _obscureConfirmPassword = !_obscureConfirmPassword;
                       });
                     },
                   ),
@@ -163,8 +163,7 @@ class _KayitPageState extends State<KayitPage> {
                         child: Container(
                           padding: const EdgeInsets.symmetric(vertical: 12),
                           decoration: BoxDecoration(
-                            border:
-                                Border.all(color: Colors.black, width: 1.5),
+                            border: Border.all(color: Colors.black, width: 1.5),
                             borderRadius: BorderRadius.circular(32),
                           ),
                           alignment: Alignment.center,
@@ -199,8 +198,7 @@ class _KayitPageState extends State<KayitPage> {
                         child: Container(
                           padding: const EdgeInsets.symmetric(vertical: 12),
                           decoration: BoxDecoration(
-                            border:
-                                Border.all(color: Colors.black, width: 1.5),
+                            border: Border.all(color: Colors.black, width: 1.5),
                             borderRadius: BorderRadius.circular(32),
                           ),
                           alignment: Alignment.center,
@@ -262,6 +260,28 @@ class _KayitPageState extends State<KayitPage> {
 
     final String collection = _selectedOption == 0 ? 'Kurum' : 'Veli';
 
+    final bool adKayitli = await _kayitVarMi(collection, 'kurumAd', ad);
+    if (adKayitli) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Bu kurum adı zaten kayıtlı')),
+      );
+      return;
+    }
+
+    final bool emailKayitli = await _kayitVarMi(
+      collection,
+      'kurumEmail',
+      email,
+    );
+    if (emailKayitli) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Bu e-posta zaten kayıtlı')));
+      return;
+    }
+
     final Map<String, dynamic> kurumlar = {
       "kurumAd": ad,
       "kurumEmail": email,
@@ -274,15 +294,29 @@ class _KayitPageState extends State<KayitPage> {
         .collection(collection)
         .add(kurumlar)
         .then((_) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Kayıt başarıyla eklendi')),
-      );
-    }).catchError((e) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Kayıt eklenemedi: $e')),
-      );
-    });
+          if (!mounted) return;
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Kayıt başarıyla eklendi')),
+          );
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const AnasayfaPage()),
+          );
+        })
+        .catchError((e) {
+          if (!mounted) return;
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text('Kayıt eklenemedi: $e')));
+        });
+  }
+
+  Future<bool> _kayitVarMi(String collection, String alan, String deger) async {
+    final sorgu = await FirebaseFirestore.instance
+        .collection(collection)
+        .where(alan, isEqualTo: deger)
+        .limit(1)
+        .get();
+    return sorgu.docs.isNotEmpty;
   }
 }
