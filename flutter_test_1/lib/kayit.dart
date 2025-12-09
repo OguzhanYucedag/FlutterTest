@@ -11,25 +11,23 @@ class KayitPage extends StatefulWidget {
 class _KayitPageState extends State<KayitPage> {
   String ad = '', sifre = '', email = '';
 
+  // Değiştirilebilir hale getirildi
+  bool _obscurePassword = true;
+  bool _obscureConfirmPassword = true;
+  int _selectedOption = 0; // 0: Kurum Kaydı seçili varsayılan
+
   adAl(adTutucu) {
-    this.ad = adTutucu;
+    ad = adTutucu;
   }
 
   emailAl(emailTutucu) {
-    this.email = emailTutucu;
+    email = emailTutucu;
   }
 
   sifreAl(sifreTutucu) {
-    this.sifre = sifreTutucu;
+    sifre = sifreTutucu;
   }
 
-  // Görsel durum için değişkenler (Sabit kalacaklar)
-  final bool _obscurePassword = true;
-  final bool _obscureConfirmPassword = true;
-  int _selectedOption = 0; // 0: Kurum Kaydı seçili varsayılan
-
-  @override
-  // Tüm kayıt ve doğrulama fonksiyonları silindi.
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -40,7 +38,7 @@ class _KayitPageState extends State<KayitPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Başlık Bölümü
+              // Başlık
               const Text(
                 'Hesap Bilgilerinizi Giriniz',
                 style: TextStyle(
@@ -51,11 +49,9 @@ class _KayitPageState extends State<KayitPage> {
               ),
               const SizedBox(height: 8),
 
-              // İsim Alanı
+              // Ad Alanı
               TextField(
-                onChanged: (String adTutucu) {
-                  adAl(adTutucu);
-                },
+                onChanged: adAl,
                 decoration: InputDecoration(
                   labelText: _selectedOption == 0 ? 'Kurum Adı' : 'Ad Soyad',
                   labelStyle: const TextStyle(color: Colors.grey),
@@ -69,11 +65,9 @@ class _KayitPageState extends State<KayitPage> {
               ),
               const SizedBox(height: 32),
 
-              // Email Alanı
+              // Email
               TextField(
-                onChanged: (String emailTutucu) {
-                  emailAl(emailTutucu);
-                },
+                onChanged: emailAl,
                 decoration: const InputDecoration(
                   labelText: 'Email',
                   labelStyle: TextStyle(color: Colors.grey),
@@ -88,11 +82,9 @@ class _KayitPageState extends State<KayitPage> {
               ),
               const SizedBox(height: 32),
 
-              // Şifre Alanı
+              // Şifre
               TextField(
-                onChanged: (String sifreTutucu) {
-                  sifreAl(sifreTutucu);
-                },
+                onChanged: sifreAl,
                 obscureText: _obscurePassword,
                 decoration: InputDecoration(
                   labelText: 'Şifre',
@@ -111,15 +103,18 @@ class _KayitPageState extends State<KayitPage> {
                       color: Colors.grey,
                     ),
                     onPressed: () {
-                      // İşlev kaldırıldı
+                      setState(() {
+                        _obscurePassword = !_obscurePassword;
+                      });
                     },
                   ),
                 ),
               ),
               const SizedBox(height: 32),
 
-              // Şifre Tekrar Alanı
+              // Şifre Tekrar
               TextField(
+                obscureText: _obscureConfirmPassword,
                 decoration: InputDecoration(
                   labelText: 'Şifre Tekrar',
                   labelStyle: const TextStyle(color: Colors.grey),
@@ -137,7 +132,10 @@ class _KayitPageState extends State<KayitPage> {
                       color: Colors.grey,
                     ),
                     onPressed: () {
-                      // İşlev kaldırıldı
+                      setState(() {
+                        _obscureConfirmPassword =
+                            !_obscureConfirmPassword;
+                      });
                     },
                   ),
                 ),
@@ -146,15 +144,13 @@ class _KayitPageState extends State<KayitPage> {
 
               const Spacer(),
 
-              // Seçim Butonları (Kurum / Veli)
+              // Kurum / Veli butonları
               Row(
-                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // Birinci Buton (Kurum)
                   Expanded(
                     child: Material(
                       color: _selectedOption == 0
-                          ? const Color.fromARGB(255, 96, 96, 96)
+                          ? Colors.black
                           : Colors.transparent,
                       borderRadius: BorderRadius.circular(32),
                       child: InkWell(
@@ -167,7 +163,8 @@ class _KayitPageState extends State<KayitPage> {
                         child: Container(
                           padding: const EdgeInsets.symmetric(vertical: 12),
                           decoration: BoxDecoration(
-                            border: Border.all(color: Colors.black, width: 1.5),
+                            border:
+                                Border.all(color: Colors.black, width: 1.5),
                             borderRadius: BorderRadius.circular(32),
                           ),
                           alignment: Alignment.center,
@@ -186,11 +183,10 @@ class _KayitPageState extends State<KayitPage> {
                     ),
                   ),
                   const SizedBox(width: 16),
-                  // İkinci Buton (Veli)
                   Expanded(
                     child: Material(
                       color: _selectedOption == 1
-                          ? const Color.fromARGB(255, 96, 96, 96)
+                          ? Colors.black
                           : Colors.transparent,
                       borderRadius: BorderRadius.circular(32),
                       child: InkWell(
@@ -203,7 +199,8 @@ class _KayitPageState extends State<KayitPage> {
                         child: Container(
                           padding: const EdgeInsets.symmetric(vertical: 12),
                           decoration: BoxDecoration(
-                            border: Border.all(color: Colors.black, width: 1.5),
+                            border:
+                                Border.all(color: Colors.black, width: 1.5),
                             borderRadius: BorderRadius.circular(32),
                           ),
                           alignment: Alignment.center,
@@ -223,9 +220,10 @@ class _KayitPageState extends State<KayitPage> {
                   ),
                 ],
               ),
+
               const SizedBox(height: 24),
 
-              // Kayıt Ol Butonu (ElevatedButton)
+              // Kayıt Ol butonu
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
@@ -235,11 +233,8 @@ class _KayitPageState extends State<KayitPage> {
                       borderRadius: BorderRadius.circular(32),
                     ),
                     padding: const EdgeInsets.symmetric(vertical: 18),
-                    elevation: 4,
                   ),
-                  onPressed: () {
-                    veriEkle();
-                  },
+                  onPressed: veriEkle,
                   child: const Text(
                     'Kayıt Ol',
                     style: TextStyle(
@@ -279,16 +274,15 @@ class _KayitPageState extends State<KayitPage> {
         .collection(collection)
         .add(kurumlar)
         .then((_) {
-          if (!mounted) return;
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Kayıt başarıyla eklendi')),
-          );
-        })
-        .catchError((e) {
-          if (!mounted) return;
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text('Kayıt eklenemedi: $e')));
-        });
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Kayıt başarıyla eklendi')),
+      );
+    }).catchError((e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Kayıt eklenemedi: $e')),
+      );
+    });
   }
 }
