@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'firebase_options.dart';
 import 'kayit.dart';
 import 'anasayfa.dart';
+import 'anasayfaveli.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -77,7 +78,7 @@ class _LoginPageState extends State<LoginPage> {
 
               // Email field
               TextField(
-                controller: _emailController,
+                controller: _emailController,//-------------EMAİL GİRİLEN KISMIN VERİYİ _emailController KAYDEDER---------------
                 decoration: const InputDecoration(
                   labelText: 'Email',
                   labelStyle: TextStyle(color: Colors.grey),
@@ -94,7 +95,7 @@ class _LoginPageState extends State<LoginPage> {
 
               // Password field
               TextField(
-                controller: _passwordController,
+                controller: _passwordController,//-------------ŞİFRE GİRİLEN KISMIN VERİYİ _passwordController KAYDEDER---------------
                 obscureText: _obscurePassword,
                 decoration: InputDecoration(
                   labelText: 'Şifre',
@@ -209,12 +210,24 @@ class _LoginPageState extends State<LoginPage> {
       final String tip = veri['tip'] ?? '';
 
       if (!mounted) return;
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => AnasayfaPage(ad: ad, email: email, tip: tip),
-        ),
-      );
+        //Giriş yapan Kurum Yada Veli mi diye kontrol eder 
+        if (tip == "kurum") {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => AnasayfaPageKurum(ad: ad, email: email, tip: tip),
+            ),
+          );
+        }
+        if (tip == "veli") {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => AnasayfaPageVeli(ad: ad, email: email, tip: tip),
+            ),
+          );
+        } 
+
     } else {
       if (!mounted) return;
       ScaffoldMessenger.of(

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'main.dart';
 
-class AnasayfaPage extends StatelessWidget {
-  const AnasayfaPage({super.key, this.ad, this.email, this.tip});
+class AnasayfaPageKurum extends StatelessWidget {
+  const AnasayfaPageKurum({super.key, this.ad, this.email, this.tip});
 
   final String? ad;
   final String? email;
@@ -40,9 +40,9 @@ class AnasayfaPage extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                'Hoş Geldiniz!',
-                style: TextStyle(
+              Text(
+                'Hoş Geldiniz! $ad',
+                style: const TextStyle(
                   fontSize: 32,
                   fontWeight: FontWeight.bold,
                   color: Colors.black,
