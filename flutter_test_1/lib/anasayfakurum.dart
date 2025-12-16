@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'main.dart';
+// import 'main.dart';
 
 class AnasayfaPageKurum extends StatelessWidget {
   const AnasayfaPageKurum({super.key, this.ad, this.email, this.tip});//tanımladığım nesleler giriş bilgilerini tutar
