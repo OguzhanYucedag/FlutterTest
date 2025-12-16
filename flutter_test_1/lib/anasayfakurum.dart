@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'main.dart';
 
 class AnasayfaPageKurum extends StatelessWidget {
-  const AnasayfaPageKurum({super.key, this.ad, this.email, this.tip});
+  const AnasayfaPageKurum({super.key, this.ad, this.email, this.tip});//tanımladığım nesleler giriş bilgilerini tutar
 
   final String? ad;
   final String? email;
@@ -13,7 +13,7 @@ class AnasayfaPageKurum extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white,
   appBar: AppBar(
-    backgroundColor: const Color(0xFFFFA94D),
+    backgroundColor: Colors.orange,
     elevation: 0,
     shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.only(
@@ -24,7 +24,7 @@ class AnasayfaPageKurum extends StatelessWidget {
     title: Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        // 🔹 AD KUTUSU (SOLDA)
+        // Ad kutusu
         if (ad != null && ad!.isNotEmpty)
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -43,29 +43,40 @@ class AnasayfaPageKurum extends StatelessWidget {
           ),
       ],
     ),
-    actions: [
-      PopupMenuButton<String>(
-        icon: const Icon(Icons.menu, color: Colors.black),
-        onSelected: (String value) {
-          // Seçilen menü öğesine göre işlem yapılabilir
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('$value seçildi')),
-          );
-        },
-        itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-          const PopupMenuItem<String>(
-            value: 'Öğretmen Ayarları',
-            child: Text('Öğretmen Ayarları'),
-          ),
-          const PopupMenuItem<String>(
-            value: 'Öğrenci Ayarları',
-            child: Text('Öğrenci Ayarları'),
-          ),
-          const PopupMenuItem<String>(
-            value: 'Profil Ayarları',
-            child: Text('Profil Ayarları'),
-          ),
-        ],
+    actions: [//hamburger menü yapısı
+      Container(
+        width: 55,
+        height: 55,
+        margin: const EdgeInsets.only(right: 8),
+        decoration: BoxDecoration(
+          color: const Color.fromARGB(255, 255, 255, 255),
+          border: Border.all(color: Colors.black, width: 1.5),
+          shape: BoxShape.circle,
+        ),
+        child: PopupMenuButton<String>(
+          iconSize: 40,
+          icon: const Icon(Icons.menu, color: Colors.black, size: 33),
+          onSelected: (String value) {
+            // Seçilen menü öğesine göre işlem yapılabilir
+            ScaffoldMessenger.of(context).showSnackBar(//seçilen değeri mesaj olarak gösteriyor 
+              SnackBar(content: Text('$value seçildi')),//seçilen değer value olarak tutuluyor 
+            );
+          },
+          itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+            const PopupMenuItem<String>(
+              value: 'Öğretmen Ayarları',
+              child: Text('Öğretmen Ayarları'),
+            ),
+            const PopupMenuItem<String>(
+              value: 'Öğrenci Ayarları',
+              child: Text('Öğrenci Ayarları'),
+            ),
+            const PopupMenuItem<String>(
+              value: 'Profil Ayarları',
+              child: Text('Profil Ayarları'),
+            ),
+          ],
+        ),
       ),
     ],
   ),
