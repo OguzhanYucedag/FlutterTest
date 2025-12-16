@@ -3,7 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'firebase_options.dart';
 import 'kayit.dart';
-import 'anasayfa.dart';
+import 'anasayfakurum.dart';
 import 'anasayfaveli.dart';
 
 void main() async {
