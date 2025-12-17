@@ -340,7 +340,7 @@ class _KayitPageState extends State<KayitPage> {
     final String adEtiketi = _selectedOption == 0 ? 'kurum adı' : 'veli adı';
     final String tip = _selectedOption == 0 ? 'kurum' : 'veli';
 
-    final bool adKayitli = await _kayitVarMi(collection, 'Ad', ad);
+    final bool adKayitli = await _kayitVarMi(collection, 'kullanıcıAd', ad);
     if (adKayitli) {
       if (!mounted) return;
       ScaffoldMessenger.of(
@@ -351,7 +351,7 @@ class _KayitPageState extends State<KayitPage> {
 
     final bool emailKayitli = await _kayitVarMi(
       collection,
-      'Email',
+      'kullanıcıEmail',
       email,
     );
     if (emailKayitli) {
@@ -363,9 +363,9 @@ class _KayitPageState extends State<KayitPage> {
     }
 
     final Map<String, dynamic> kurumlar = {
-      "Ad": ad,
-      "Email": email,
-      "Şifre": sifre,
+      "kullanıcıAd": ad,
+      "kullanıcıEmail": email,
+      "kullanıcıŞifre": sifre,
       "tip": tip,
       "olusturmaZamani": FieldValue.serverTimestamp(),
     };
