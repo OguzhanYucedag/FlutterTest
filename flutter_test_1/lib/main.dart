@@ -3,8 +3,8 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'firebase_options.dart';
 import 'kayit.dart';
-import 'anasayfakurum.dart';
-import 'anasayfaveli.dart';
+import 'kurum/anasayfakurum.dart';
+import 'kurum/anasayfaveli.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -78,7 +78,8 @@ class _LoginPageState extends State<LoginPage> {
 
               // Email field
               TextField(
-                controller: _emailController,//-------------EMAİL GİRİLEN KISMIN VERİYİ _emailController KAYDEDER---------------
+                controller:
+                    _emailController, //-------------EMAİL GİRİLEN KISMIN VERİYİ _emailController KAYDEDER---------------
                 decoration: const InputDecoration(
                   labelText: 'Email',
                   labelStyle: TextStyle(color: Colors.grey),
@@ -95,7 +96,8 @@ class _LoginPageState extends State<LoginPage> {
 
               // Password field
               TextField(
-                controller: _passwordController,//-------------ŞİFRE GİRİLEN KISMIN VERİYİ _passwordController KAYDEDER---------------
+                controller:
+                    _passwordController, //-------------ŞİFRE GİRİLEN KISMIN VERİYİ _passwordController KAYDEDER---------------
                 obscureText: _obscurePassword,
                 decoration: InputDecoration(
                   labelText: 'Şifre',
@@ -121,44 +123,9 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 ),
               ),
-              const SizedBox(height: 24),
-
-              // Kayıt Ol button
-              Center(
-                child: Material(
-                  elevation: 4.0,
-                  borderRadius: BorderRadius.circular(32),
-                  color: Colors.white,
-                  child: OutlinedButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const KayitPage(),
-                        ),
-                      );
-                    },
-                    style: OutlinedButton.styleFrom(
-                      side: const BorderSide(color: Colors.black),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(32),
-                      ),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 32,
-                        vertical: 12,
-                      ),
-                    ),
-                    child: const Text(
-                      'Kayıt Ol',
-                      style: TextStyle(color: Colors.black, fontSize: 16),
-                    ),
-                  ),
-                ),
-              ),
-
               const Spacer(),
 
-              // Giriş Yap button (ElevatedButton ile aynı tasarım)
+              // Giriş Yap button
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
@@ -175,6 +142,35 @@ class _LoginPageState extends State<LoginPage> {
                   onPressed: _girisYap,
                   child: const Text(
                     'Giriş Yap',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              // Kayıt Ol button
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const KayitPage(),
+                      ),
+                    );
+                  },
+                  style: OutlinedButton.styleFrom(
+                    side: const BorderSide(color: Colors.black, width: 2),
+                    backgroundColor: Colors.white,
+                    foregroundColor: Colors.black,
+                    padding: const EdgeInsets.symmetric(vertical: 18),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(32),
+                    ),
+                  ),
+                  child: const Text(
+                    'Kayıt Ol',
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                 ),
@@ -210,24 +206,25 @@ class _LoginPageState extends State<LoginPage> {
       final String tip = veri['tip'] ?? '';
 
       if (!mounted) return;
-        //Giriş yapan Kurum Yada Veli mi diye kontrol eder 
-        if (tip == "kurum") {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => AnasayfaPageKurum(ad: ad, email: email, tip: tip),
-            ),
-          );
-        }
-        if (tip == "veli") {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => AnasayfaPageVeli(ad: ad, email: email, tip: tip),
-            ),
-          );
-        } 
-
+      //Giriş yapan Kurum Yada Veli mi diye kontrol eder
+      if (tip == "kurum") {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) =>
+                AnasayfaPageKurum(ad: ad, email: email, tip: tip),
+          ),
+        );
+      }
+      if (tip == "veli") {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) =>
+                AnasayfaPageVeli(ad: ad, email: email, tip: tip),
+          ),
+        );
+      }
     } else {
       if (!mounted) return;
       ScaffoldMessenger.of(
