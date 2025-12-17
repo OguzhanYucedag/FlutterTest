@@ -5,7 +5,7 @@ import 'firebase_options.dart';
 import 'kayit.dart';
 import 'anasayfa.dart';
 import 'anasayfaveli.dart';
-
+//mahmutmahmut
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
