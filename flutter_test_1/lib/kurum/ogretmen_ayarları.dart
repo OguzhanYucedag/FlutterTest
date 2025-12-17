@@ -16,6 +16,14 @@ class _OgretmenAyarlariPageState extends State<OgretmenAyarlariPage> {
   final TextEditingController _sifreController = TextEditingController();
 
   bool _obscurePassword = true;
+  final List<_OgretmenKaydi> _ogretmenler = [];
+  bool _listeYukleniyor = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _ogretmenleriGetir();
+  }
 
   @override
   void dispose() {
@@ -43,7 +51,7 @@ class _OgretmenAyarlariPageState extends State<OgretmenAyarlariPage> {
         ),
       ),
       body: SafeArea(
-        child: Padding(
+        child: SingleChildScrollView(
           padding: const EdgeInsets.all(24.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -154,6 +162,54 @@ class _OgretmenAyarlariPageState extends State<OgretmenAyarlariPage> {
                         ),
                       ),
                     ),
+                    const SizedBox(height: 16),
+                    _listeYukleniyor
+                        ? const Center(child: CircularProgressIndicator())
+                        : ListView.builder(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            itemCount: _ogretmenler.length,
+                            itemBuilder: (context, index) {
+                              final ogretmen = _ogretmenler[index];
+                              return Container(
+                                margin: const EdgeInsets.only(bottom: 8),
+                                padding: const EdgeInsets.symmetric(
+                                    vertical: 12, horizontal: 16),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFF1F5F9),
+                                  borderRadius: BorderRadius.circular(10),
+                                  border: Border.all(
+                                    color: Colors.grey.withOpacity(0.25),
+                                  ),
+                                ),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      ogretmen.ad.isEmpty
+                                          ? 'İsim yok'
+                                          : ogretmen.ad,
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.black87,
+                                      ),
+                                    ),
+                                    IconButton(
+                                      icon: const Icon(
+                                        Icons.remove_circle_outline,
+                                        color: Colors.red,
+                                      ),
+                                      onPressed: () =>
+                                          _ogretmenSil(ogretmen.id),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
+                          ),
+                    const SizedBox(height: 8),
                   ],
                 ),
               ),
@@ -214,6 +270,7 @@ class _OgretmenAyarlariPageState extends State<OgretmenAyarlariPage> {
       _emailController.clear();
       _numaraController.clear();
       _sifreController.clear();
+      _ogretmenleriGetir();
     }).catchError((e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -230,4 +287,55 @@ class _OgretmenAyarlariPageState extends State<OgretmenAyarlariPage> {
         .get();
     return sorgu.docs.isNotEmpty;
   }
+
+  Future<void> _ogretmenleriGetir() async {
+    setState(() {
+      _listeYukleniyor = true;
+    });
+
+    try {
+      final sorgu = await FirebaseFirestore.instance
+          .collection('users')
+          .where('tip', isEqualTo: 'ogretmen')
+          .get();
+
+      if (!mounted) return;
+      setState(() {
+        _ogretmenler
+          ..clear()
+          ..addAll(
+            sorgu.docs
+                .map(
+                  (d) => _OgretmenKaydi(
+                    id: d.id,
+                    ad: (d.data()['kullanıcıAd'] ?? '').toString(),
+                  ),
+                )
+                .toList(),
+          );
+      });
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Öğretmenler getirilemedi: $e')),
+      );
+    } finally {
+      if (!mounted) return;
+      setState(() {
+        _listeYukleniyor = false;
+      });
+    }
+  }
+
+  Future<void> _ogretmenSil(String id) async {
+    await FirebaseFirestore.instance.collection('users').doc(id).delete();
+    await _ogretmenleriGetir();
+  }
+}
+
+class _OgretmenKaydi {
+  _OgretmenKaydi({required this.id, required this.ad});
+
+  final String id;
+  final String ad;
 }
