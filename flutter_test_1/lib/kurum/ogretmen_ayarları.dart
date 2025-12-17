@@ -46,9 +46,77 @@ class OgretmenAyarlariPage extends StatelessWidget {
                     ),
                   ],
                 ),
-                child: const Text(
-                  'Bu sayfadan öğretmen ekleme, çıkarma ve düzenleme işlemleri yapılacaktır.',
-                  style: TextStyle(fontSize: 16, color: Colors.black87),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Öğretmen bilgilerini girerek kaydedebilirsiniz.',
+                      style: TextStyle(fontSize: 16, color: Colors.black87),
+                    ),
+                    const SizedBox(height: 16),
+                    const TextField(//Öğretmen Adı alanı
+                      //onChanged: ogretmenAdAl,
+                      decoration: InputDecoration(
+                        labelText: 'Öğretmen Adı',
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    const TextField(//Öğretmen Soyadı alanı
+                      //onChanged: ogretmenSoyadAl,
+                      decoration: InputDecoration(
+                        labelText: 'Öğretmen Soyadı',
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    const TextField(//Öğretmen Email alanı
+                      //onChanged: ogretmenEmailAl,
+                      keyboardType: TextInputType.emailAddress,
+                      decoration: InputDecoration(
+                        labelText: 'Email',
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    const TextField(//Öğretmen Numara alanı
+                      //onChanged: ogretmenNumaraAl,
+                      keyboardType: TextInputType.phone,
+                      decoration: InputDecoration(
+                        labelText: 'Numara',
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    const TextField(//Öğretmen Şifre alanı
+                      obscureText: true,
+                      decoration: InputDecoration(
+                        labelText: 'Şifre',
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          // TODO: kayıt işlemi eklenecek
+                          veriOgretmenEkle();
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF1565C0),
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        child: const Text(
+                          'Kaydet',
+                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold,color: Colors.black),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
@@ -57,4 +125,13 @@ class OgretmenAyarlariPage extends StatelessWidget {
       ),
     );
   }
+  Future<void> veriOgretmenEkle() async {
+    
+    
+    
+  }
+
+
+
+  
 }

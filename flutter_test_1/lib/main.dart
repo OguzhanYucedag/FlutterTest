@@ -195,14 +195,14 @@ class _LoginPageState extends State<LoginPage> {
 
     final sorgu = await FirebaseFirestore.instance
         .collection('users')
-        .where('kurumEmail', isEqualTo: email)
-        .where('kurumŞifre', isEqualTo: sifre)
+        .where('Email', isEqualTo: email)
+        .where('Şifre', isEqualTo: sifre)
         .limit(1)
         .get();
 
     if (sorgu.docs.isNotEmpty) {
       final veri = sorgu.docs.first.data();
-      final String ad = veri['kurumAd'] ?? '';
+      final String ad = veri['Ad'] ?? '';
       final String tip = veri['tip'] ?? '';
 
       if (!mounted) return;
