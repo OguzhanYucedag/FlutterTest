@@ -5,6 +5,7 @@ import 'firebase_options.dart';
 import 'kayit.dart';
 import 'kurum/anasayfakurum.dart';
 import 'kurum/anasayfaveli.dart';
+import 'ogretmen/ogretmen_giris.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -231,14 +232,14 @@ class _LoginPageState extends State<LoginPage> {
 
     final sorgu = await FirebaseFirestore.instance
         .collection('users')
-        .where('Email', isEqualTo: email)
-        .where('Şifre', isEqualTo: sifre)
+        .where('kullanıcıEmail', isEqualTo: email)
+        .where('kullanıcıŞifre', isEqualTo: sifre)
         .limit(1)
         .get();
 
     if (sorgu.docs.isNotEmpty) {
       final veri = sorgu.docs.first.data();
-      final String ad = veri['Ad'] ?? '';
+      final String ad = veri['kullanıcıAd'] ?? '';
       final String tip = veri['tip'] ?? '';
 
       if (!mounted) return;
@@ -258,6 +259,15 @@ class _LoginPageState extends State<LoginPage> {
           MaterialPageRoute(
             builder: (context) =>
                 AnasayfaPageVeli(ad: ad, email: email, tip: tip),
+          ),
+        );
+      }
+      if (tip == "ogretmen") {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) =>
+                OgretmenGirisPage(ad: ad, email: email, tip: tip),
           ),
         );
       }
