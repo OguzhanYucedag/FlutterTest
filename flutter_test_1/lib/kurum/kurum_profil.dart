@@ -31,124 +31,188 @@ class _KurumProfilPageState extends State<KurumProfilPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
-      appBar: AppBar(
-        title: const Text('Profil Ayarları'),
-        backgroundColor: const Color(0xFF1565C0),
-        elevation: 0,
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.only(
-            bottomLeft: Radius.circular(25),
-            bottomRight: Radius.circular(25),
-          ),
-        ),
-      ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(24.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'Kurum Bilgileri',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF0D47A1),
-                  ),
-                ),
-                const SizedBox(height: 24),
-
-                // Form Container
-                Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(16),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
-                        blurRadius: 10,
-                        offset: const Offset(0, 4),
-                      ),
+      backgroundColor: const Color(0xFFF8FAF8), // Açık yeşil arka plan
+      body: CustomScrollView(
+        slivers: [
+          // Header
+          SliverAppBar(
+            expandedHeight: 140,
+            pinned: true,
+            elevation: 0,
+            backgroundColor: Colors.transparent,
+            flexibleSpace: FlexibleSpaceBar(
+              background: Container(
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      Color(0xFF4CAF50), // Yeşil 500
+                      Color(0xFF388E3C), // Yeşil 700
                     ],
                   ),
-                  child: Column(
-                    children: [
-                      _buildTextField(
-                        controller: _kurumKoduAdiController,
-                        label: 'Kurum Kodu ve Adı',
-                        icon: Icons.school,
-                      ),
-                      const SizedBox(height: 16),
-                      _buildTextField(
-                        controller: _kurumTuruController,
-                        label: 'Kurum Türü',
-                        icon: Icons.category,
-                      ),
-                      const SizedBox(height: 16),
-                      _buildTextField(
-                        controller: _ogretimSekliController,
-                        label: 'Öğretim Şekli',
-                        icon: Icons.menu_book,
-                      ),
-                      const SizedBox(height: 16),
-                      _buildTextField(
-                        controller: _hizmetBolgesiController,
-                        label: 'Hizmet Bölgesi ve Alanı',
-                        icon: Icons.map,
-                      ),
-                      const SizedBox(height: 16),
-                      _buildTextField(
-                        controller: _telefonController,
-                        label: 'Telefon',
-                        icon: Icons.phone,
-                        keyboardType: TextInputType.phone,
-                      ),
-                      const SizedBox(height: 16),
-                      _buildTextField(
-                        controller: _adresController,
-                        label: 'Adres',
-                        icon: Icons.location_on,
-                        maxLines: 3,
-                      ),
-                    ],
+                  borderRadius: BorderRadius.only(
+                    bottomLeft: Radius.circular(30),
+                    bottomRight: Radius.circular(30),
                   ),
                 ),
-
-                const SizedBox(height: 24),
-
-                // Kaydet Butonu
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton.icon(
-                    onPressed: () {
-                      // Kaydetme işlemi
-                    },
-                    icon: const Icon(Icons.save),
-                    label: const Text(
-                      'Kaydet',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
+              ),
+              title: const Text(
+                'Kurum Profili',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                  fontSize: 22,
+                  shadows: [
+                    Shadow(
+                      blurRadius: 3,
+                      color: Colors.black26,
+                      offset: Offset(1, 1),
                     ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF1565C0),
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      elevation: 4,
-                    ),
-                  ),
+                  ],
                 ),
-              ],
+              ),
+              centerTitle: true,
+            ),
+            leading: IconButton(
+              icon: const Icon(
+                Icons.arrow_back_ios_new_rounded,
+                color: Colors.white,
+              ),
+              onPressed: () => Navigator.pop(context),
             ),
           ),
-        ),
+
+          // Content
+          SliverPadding(
+            padding: const EdgeInsets.all(20),
+            sliver: SliverList(
+              delegate: SliverChildListDelegate([
+                // Form Card
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.green.withValues(alpha: 0.1),
+                        blurRadius: 20,
+                        offset: const Offset(0, 8),
+                      ),
+                    ],
+                    border: Border.all(
+                      color: Colors.green.withValues(alpha: 0.1),
+                      width: 1,
+                    ),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(24),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Header
+                        Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: const Color(
+                                  0xFF4CAF50,
+                                ).withValues(alpha: 0.1),
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: const Color(
+                                    0xFF4CAF50,
+                                  ).withValues(alpha: 0.3),
+                                  width: 2,
+                                ),
+                              ),
+                              child: const Icon(
+                                Icons.business_outlined,
+                                color: Color(0xFF4CAF50),
+                                size: 28,
+                              ),
+                            ),
+                            const SizedBox(width: 16),
+                            const Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Kurum Bilgileri',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: Color(0xFF263238),
+                                  ),
+                                ),
+                                Text(
+                                  'Kurum bilgilerinizi güncelleyin',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: Color(0xFF546E7A),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 24),
+
+                        // Form Fields
+                        _buildTextField(
+                          controller: _kurumKoduAdiController,
+                          label: 'Kurum Kodu ve Adı',
+                          icon: Icons.school_outlined,
+                        ),
+                        const SizedBox(height: 16),
+
+                        _buildTextField(
+                          controller: _kurumTuruController,
+                          label: 'Kurum Türü',
+                          icon: Icons.category_outlined,
+                        ),
+                        const SizedBox(height: 16),
+
+                        _buildTextField(
+                          controller: _ogretimSekliController,
+                          label: 'Öğretim Şekli',
+                          icon: Icons.menu_book_outlined,
+                        ),
+                        const SizedBox(height: 16),
+
+                        _buildTextField(
+                          controller: _hizmetBolgesiController,
+                          label: 'Hizmet Bölgesi ve Alanı',
+                          icon: Icons.map_outlined,
+                        ),
+                        const SizedBox(height: 16),
+
+                        _buildTextField(
+                          controller: _telefonController,
+                          label: 'Telefon',
+                          icon: Icons.phone_outlined,
+                          keyboardType: TextInputType.phone,
+                        ),
+                        const SizedBox(height: 16),
+
+                        _buildTextField(
+                          controller: _adresController,
+                          label: 'Adres',
+                          icon: Icons.location_on_outlined,
+                          maxLines: 3,
+                        ),
+                        const SizedBox(height: 24),
+
+                        // Save Button
+                        _buildSaveButton(),
+                      ],
+                    ),
+                  ),
+                ),
+              ]),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -160,24 +224,66 @@ class _KurumProfilPageState extends State<KurumProfilPage> {
     TextInputType keyboardType = TextInputType.text,
     int maxLines = 1,
   }) {
-    return TextField(
-      controller: controller,
-      keyboardType: keyboardType,
-      maxLines: maxLines,
-      decoration: InputDecoration(
-        labelText: label,
-        prefixIcon: Icon(icon, color: const Color(0xFF1565C0)),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: Colors.grey.shade300),
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: const Color(0xFF4CAF50).withValues(alpha: 0.5),
         ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Color(0xFF1565C0), width: 2),
+      ),
+      child: TextField(
+        controller: controller,
+        keyboardType: keyboardType,
+        maxLines: maxLines,
+        style: const TextStyle(fontSize: 15, color: Color(0xFF37474F)),
+        decoration: InputDecoration(
+          labelText: label,
+          labelStyle: const TextStyle(
+            color: Color(0xFF2E7D32),
+          ), // Darker green for label
+          prefixIcon: Icon(icon, color: const Color(0xFF4CAF50)),
+          border: InputBorder.none,
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 16,
+            vertical: 16,
+          ),
+          filled: true,
+          fillColor: const Color(
+            0xFF4CAF50,
+          ).withValues(alpha: 0.05), // Light green fill
         ),
-        filled: true,
-        fillColor: Colors.grey.shade50,
+      ),
+    );
+  }
+
+  Widget _buildSaveButton() {
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton(
+        onPressed: () {
+          // Kaydetme işlemi
+        },
+        style: ElevatedButton.styleFrom(
+          backgroundColor: const Color(0xFF4CAF50),
+          foregroundColor: Colors.white,
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          elevation: 2,
+          shadowColor: Colors.green.withValues(alpha: 0.3),
+        ),
+        child: const Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.save_alt_rounded, size: 20),
+            SizedBox(width: 8),
+            Text(
+              'Bilgileri Kaydet',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+            ),
+          ],
+        ),
       ),
     );
   }
