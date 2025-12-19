@@ -60,9 +60,7 @@ class _LoginPageState extends State<LoginPage> {
                 image: const AssetImage('assets/images/login_bg.jpg'),
                 fit: BoxFit.cover,
                 colorFilter: ColorFilter.mode(
-                  Colors.white.withOpacity(
-                    0.8,
-                  ), // Using withValues for alpha/opacity if needed, but withOpacity is standard
+                  Colors.white.withValues(alpha: 0.8),
                   BlendMode.lighten,
                 ),
               ),

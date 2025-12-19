@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
 class OgrenciIstatistikPage extends StatefulWidget {
-  const OgrenciIstatistikPage({super.key});
+  final String? ogretmenAdi;
+  
+  const OgrenciIstatistikPage({super.key, this.ogretmenAdi});
 
   @override
   State<OgrenciIstatistikPage> createState() => _OgrenciIstatistikPageState();
@@ -49,6 +51,7 @@ class _OgrenciIstatistikPageState extends State<OgrenciIstatistikPage> {
     {
       'name': 'Ahmet Yılmaz',
       'avatarColor': Colors.blue,
+      'teacherComment': 'Ahmet matematik alanında çok başarılı, ancak sosyal becerilerde biraz desteğe ihtiyacı var.',
       'subjects': [
         {'name': 'Akademik Alanlar', 'progress': 0.85},
         {'name': 'Dil ve İletişim Gelişimi', 'progress': 0.70},
@@ -60,6 +63,7 @@ class _OgrenciIstatistikPageState extends State<OgrenciIstatistikPage> {
     {
       'name': 'Ayşe Kaya',
       'avatarColor': Colors.purple,
+      'teacherComment': 'Ayşe sanat ve estetik alanında çok yetenekli, yaratıcılığı takdire şayan.',
       'subjects': [
         {'name': 'Akademik Alanlar', 'progress': 0.95},
         {'name': 'Dil ve İletişim Gelişimi', 'progress': 0.88},
@@ -71,6 +75,7 @@ class _OgrenciIstatistikPageState extends State<OgrenciIstatistikPage> {
     {
       'name': 'Can Yıldız',
       'avatarColor': Colors.teal,
+      'teacherComment': 'Can beden eğitiminde çok başarılı, ancak akademik alanlarda desteğe ihtiyacı var.',
       'subjects': [
         {'name': 'Akademik Alanlar', 'progress': 0.65},
         {'name': 'Beden Eğitimi ve Oyun', 'progress': 0.95},
@@ -82,6 +87,7 @@ class _OgrenciIstatistikPageState extends State<OgrenciIstatistikPage> {
     {
       'name': 'Zeynep Çelik',
       'avatarColor': Colors.orange,
+      'teacherComment': 'Zeynep dil becerilerinde çok iyi, iletişim kurma konusunda örnek bir öğrenci.',
       'subjects': [
         {'name': 'Dil ve İletişim Gelişimi', 'progress': 0.92},
         {'name': 'Sanat ve Estetik', 'progress': 0.88},
@@ -93,6 +99,7 @@ class _OgrenciIstatistikPageState extends State<OgrenciIstatistikPage> {
     {
       'name': 'Mehmet Demir',
       'avatarColor': Colors.green,
+      'teacherComment': 'Mehmet fiziksel aktivitelerde çok başarılı, ancak dil becerilerini geliştirmeye ihtiyacı var.',
       'subjects': [
         {'name': 'Beden Eğitimi ve Oyun', 'progress': 0.85},
         {'name': 'Psikomotor Gelişim', 'progress': 0.80},
@@ -124,6 +131,115 @@ class _OgrenciIstatistikPageState extends State<OgrenciIstatistikPage> {
     });
 
     return averages;
+  }
+
+  // Yorum düzenleme için state
+  int? _selectedStudentIndex;
+  TextEditingController _commentController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _commentController = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    _commentController.dispose();
+    super.dispose();
+  }
+
+  void _showEditCommentDialog(int index, String currentComment) {
+    _selectedStudentIndex = index;
+    _commentController.text = currentComment;
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Row(
+          children: [
+            const Icon(Icons.comment, color: Color(0xFF1E88E5)),
+            const SizedBox(width: 8),
+            Text(
+              '${_studentStats[index]['name']} - Yorum Düzenle',
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+        content: SizedBox(
+          width: double.maxFinite,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: _commentController,
+                maxLines: 5,
+                decoration: const InputDecoration(
+                  hintText: 'Öğrenci için yorumunuzu yazın...',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(12)),
+                  ),
+                  filled: true,
+                  fillColor: Colors.white,
+                  contentPadding: EdgeInsets.all(12),
+                ),
+              ),
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  const Icon(Icons.info_outline, size: 16, color: Colors.blueGrey),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'Bu yorum veli ekranında görünecektir.',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.blueGrey[600],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('İptal'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              if (_commentController.text.isNotEmpty) {
+                setState(() {
+                  _studentStats[index]['teacherComment'] = _commentController.text;
+                });
+                Navigator.pop(context);
+                
+                // Başarı mesajı göster
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('${_studentStats[index]['name']} için yorum güncellendi'),
+                    backgroundColor: Colors.green,
+                    duration: const Duration(seconds: 2),
+                  ),
+                );
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF1E88E5),
+            ),
+            child: const Text(
+              'Kaydet',
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -160,13 +276,26 @@ class _OgrenciIstatistikPageState extends State<OgrenciIstatistikPage> {
                   ),
                 ),
               ),
-              title: const Text(
-                'Öğrenci İstatistikleri',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                  fontSize: 20,
-                ),
+              title: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text(
+                    'Öğrenci İstatistikleri',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                      fontSize: 20,
+                    ),
+                  ),
+                  if (widget.ogretmenAdi != null)
+                    Text(
+                      widget.ogretmenAdi!,
+                      style: const TextStyle(
+                        color: Colors.white70,
+                        fontSize: 12,
+                      ),
+                    ),
+                ],
               ),
               centerTitle: true,
             ),
@@ -177,15 +306,6 @@ class _OgrenciIstatistikPageState extends State<OgrenciIstatistikPage> {
               ),
               onPressed: () => Navigator.pop(context),
             ),
-            actions: [
-              IconButton(
-                icon: const Icon(
-                  Icons.filter_list_rounded,
-                  color: Colors.white,
-                ),
-                onPressed: () {},
-              ),
-            ],
           ),
 
           // İçerik
@@ -198,7 +318,7 @@ class _OgrenciIstatistikPageState extends State<OgrenciIstatistikPage> {
                 }
                 final studentIndex = index - 1;
                 final student = _studentStats[studentIndex];
-                return _buildStudentStatCard(student);
+                return _buildStudentStatCard(student, studentIndex);
               }, childCount: _studentStats.length + 1),
             ),
           ),
@@ -215,7 +335,7 @@ class _OgrenciIstatistikPageState extends State<OgrenciIstatistikPage> {
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: Colors.blueGrey.withValues(alpha: 0.1),
+            color: Colors.blueGrey.withOpacity(0.1),
             blurRadius: 20,
             offset: const Offset(0, 10),
           ),
@@ -227,7 +347,7 @@ class _OgrenciIstatistikPageState extends State<OgrenciIstatistikPage> {
           Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: const Color(0xFF1E88E5).withValues(alpha: 0.05),
+              color: const Color(0xFF1E88E5).withOpacity(0.05),
               borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(24),
                 topRight: Radius.circular(24),
@@ -324,7 +444,7 @@ class _OgrenciIstatistikPageState extends State<OgrenciIstatistikPage> {
                         Container(
                           padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
-                            color: color.withValues(alpha: 0.1),
+                            color: color.withOpacity(0.1),
                             shape: BoxShape.circle,
                           ),
                           child: Icon(icon, color: color, size: 20),
@@ -345,7 +465,7 @@ class _OgrenciIstatistikPageState extends State<OgrenciIstatistikPage> {
                             vertical: 6,
                           ),
                           decoration: BoxDecoration(
-                            color: color.withValues(alpha: 0.1),
+                            color: color.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(20),
                           ),
                           child: Text(
@@ -369,7 +489,7 @@ class _OgrenciIstatistikPageState extends State<OgrenciIstatistikPage> {
     );
   }
 
-  Widget _buildStudentStatCard(Map<String, dynamic> student) {
+  Widget _buildStudentStatCard(Map<String, dynamic> student, int studentIndex) {
     final List<Map<String, dynamic>> subjects = List<Map<String, dynamic>>.from(
       student['subjects'],
     );
@@ -377,7 +497,9 @@ class _OgrenciIstatistikPageState extends State<OgrenciIstatistikPage> {
     // İlerleme ortalaması hesapla
     final double averageProgress =
         subjects.map((s) => s['progress'] as double).reduce((a, b) => a + b) /
-        subjects.length;
+            subjects.length;
+
+    final String teacherComment = student['teacherComment'] ?? '';
 
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
@@ -386,7 +508,7 @@ class _OgrenciIstatistikPageState extends State<OgrenciIstatistikPage> {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: Colors.black.withOpacity(0.05),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -405,15 +527,13 @@ class _OgrenciIstatistikPageState extends State<OgrenciIstatistikPage> {
                 end: Alignment.bottomRight,
                 colors: [
                   student['avatarColor'] as Color,
-                  (student['avatarColor'] as Color).withValues(alpha: 0.7),
+                  (student['avatarColor'] as Color).withOpacity(0.7),
                 ],
               ),
               shape: BoxShape.circle,
               boxShadow: [
                 BoxShadow(
-                  color: (student['avatarColor'] as Color).withValues(
-                    alpha: 0.3,
-                  ),
+                  color: (student['avatarColor'] as Color).withOpacity(0.3),
                   blurRadius: 8,
                   offset: const Offset(0, 4),
                 ),
@@ -459,7 +579,7 @@ class _OgrenciIstatistikPageState extends State<OgrenciIstatistikPage> {
           trailing: Container(
             padding: const EdgeInsets.all(6),
             decoration: BoxDecoration(
-              color: Colors.blue.withValues(alpha: 0.1),
+              color: Colors.blue.withOpacity(0.1),
               shape: BoxShape.circle,
             ),
             child: Icon(
@@ -470,8 +590,95 @@ class _OgrenciIstatistikPageState extends State<OgrenciIstatistikPage> {
           ),
           childrenPadding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
           children: [
+            // Öğretmen Yorumu Bölümü
+            Container(
+              margin: const EdgeInsets.only(bottom: 16),
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.orange[50],
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.orange[100]!),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          const Icon(
+                            Icons.comment,
+                            size: 18,
+                            color: Colors.orange,
+                          ),
+                          const SizedBox(width: 8),
+                          const Text(
+                            'Öğretmen Yorumu',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.orange,
+                            ),
+                          ),
+                        ],
+                      ),
+                      IconButton(
+                        icon: const Icon(
+                          Icons.edit_outlined,
+                          size: 18,
+                          color: Colors.orange,
+                        ),
+                        onPressed: () {
+                          _showEditCommentDialog(studentIndex, teacherComment);
+                        },
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    teacherComment.isNotEmpty 
+                        ? teacherComment 
+                        : 'Henüz yorum eklenmemiş.',
+                    style: const TextStyle(
+                      fontSize: 13,
+                      color: Colors.black87,
+                      height: 1.5,
+                    ),
+                  ),
+                  if (widget.ogretmenAdi != null && teacherComment.isNotEmpty)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 8),
+                      child: Align(
+                        alignment: Alignment.centerRight,
+                        child: Text(
+                          widget.ogretmenAdi!,
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: Colors.orange[700],
+                            fontStyle: FontStyle.italic,
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+
+            // Ders İlerlemeleri
             const Divider(color: Colors.grey, height: 20),
             const SizedBox(height: 8),
+            const Text(
+              'Ders İlerlemeleri',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 14,
+                color: Color(0xFF455A64),
+              ),
+            ),
+            const SizedBox(height: 12),
             ...subjects.map((subject) {
               final color = _fieldColors[subject['name']] ?? Colors.grey;
               final icon = _fieldIcons[subject['name']] ?? Icons.category;
@@ -485,10 +692,10 @@ class _OgrenciIstatistikPageState extends State<OgrenciIstatistikPage> {
   }
 
   Widget _buildSubjectProgressItem(
-    Map<String, dynamic> subject,
-    Color color,
-    IconData icon,
-  ) {
+      Map<String, dynamic> subject,
+      Color color,
+      IconData icon,
+      ) {
     final progress = subject['progress'] as double;
 
     return Padding(
@@ -498,7 +705,7 @@ class _OgrenciIstatistikPageState extends State<OgrenciIstatistikPage> {
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.1),
+              color: color.withOpacity(0.1),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Icon(icon, color: color, size: 20),
