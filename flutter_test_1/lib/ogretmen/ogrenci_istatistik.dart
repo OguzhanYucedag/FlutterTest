@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class OgrenciIstatistikPage extends StatefulWidget {
   final String? ogretmenAdi;
-  
+
   const OgrenciIstatistikPage({super.key, this.ogretmenAdi});
 
   @override
@@ -51,7 +51,8 @@ class _OgrenciIstatistikPageState extends State<OgrenciIstatistikPage> {
     {
       'name': 'Ahmet Yılmaz',
       'avatarColor': Colors.blue,
-      'teacherComment': 'Ahmet matematik alanında çok başarılı, ancak sosyal becerilerde biraz desteğe ihtiyacı var.',
+      'teacherComment':
+          'Ahmet matematik alanında çok başarılı, ancak sosyal becerilerde biraz desteğe ihtiyacı var.',
       'subjects': [
         {'name': 'Akademik Alanlar', 'progress': 0.85},
         {'name': 'Dil ve İletişim Gelişimi', 'progress': 0.70},
@@ -63,7 +64,8 @@ class _OgrenciIstatistikPageState extends State<OgrenciIstatistikPage> {
     {
       'name': 'Ayşe Kaya',
       'avatarColor': Colors.purple,
-      'teacherComment': 'Ayşe sanat ve estetik alanında çok yetenekli, yaratıcılığı takdire şayan.',
+      'teacherComment':
+          'Ayşe sanat ve estetik alanında çok yetenekli, yaratıcılığı takdire şayan.',
       'subjects': [
         {'name': 'Akademik Alanlar', 'progress': 0.95},
         {'name': 'Dil ve İletişim Gelişimi', 'progress': 0.88},
@@ -75,7 +77,8 @@ class _OgrenciIstatistikPageState extends State<OgrenciIstatistikPage> {
     {
       'name': 'Can Yıldız',
       'avatarColor': Colors.teal,
-      'teacherComment': 'Can beden eğitiminde çok başarılı, ancak akademik alanlarda desteğe ihtiyacı var.',
+      'teacherComment':
+          'Can beden eğitiminde çok başarılı, ancak akademik alanlarda desteğe ihtiyacı var.',
       'subjects': [
         {'name': 'Akademik Alanlar', 'progress': 0.65},
         {'name': 'Beden Eğitimi ve Oyun', 'progress': 0.95},
@@ -87,7 +90,8 @@ class _OgrenciIstatistikPageState extends State<OgrenciIstatistikPage> {
     {
       'name': 'Zeynep Çelik',
       'avatarColor': Colors.orange,
-      'teacherComment': 'Zeynep dil becerilerinde çok iyi, iletişim kurma konusunda örnek bir öğrenci.',
+      'teacherComment':
+          'Zeynep dil becerilerinde çok iyi, iletişim kurma konusunda örnek bir öğrenci.',
       'subjects': [
         {'name': 'Dil ve İletişim Gelişimi', 'progress': 0.92},
         {'name': 'Sanat ve Estetik', 'progress': 0.88},
@@ -99,7 +103,8 @@ class _OgrenciIstatistikPageState extends State<OgrenciIstatistikPage> {
     {
       'name': 'Mehmet Demir',
       'avatarColor': Colors.green,
-      'teacherComment': 'Mehmet fiziksel aktivitelerde çok başarılı, ancak dil becerilerini geliştirmeye ihtiyacı var.',
+      'teacherComment':
+          'Mehmet fiziksel aktivitelerde çok başarılı, ancak dil becerilerini geliştirmeye ihtiyacı var.',
       'subjects': [
         {'name': 'Beden Eğitimi ve Oyun', 'progress': 0.85},
         {'name': 'Psikomotor Gelişim', 'progress': 0.80},
@@ -162,10 +167,7 @@ class _OgrenciIstatistikPageState extends State<OgrenciIstatistikPage> {
             const SizedBox(width: 8),
             Text(
               '${_studentStats[index]['name']} - Yorum Düzenle',
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
           ],
         ),
@@ -190,7 +192,11 @@ class _OgrenciIstatistikPageState extends State<OgrenciIstatistikPage> {
               const SizedBox(height: 16),
               Row(
                 children: [
-                  const Icon(Icons.info_outline, size: 16, color: Colors.blueGrey),
+                  const Icon(
+                    Icons.info_outline,
+                    size: 16,
+                    color: Colors.blueGrey,
+                  ),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
@@ -215,14 +221,17 @@ class _OgrenciIstatistikPageState extends State<OgrenciIstatistikPage> {
             onPressed: () {
               if (_commentController.text.isNotEmpty) {
                 setState(() {
-                  _studentStats[index]['teacherComment'] = _commentController.text;
+                  _studentStats[index]['teacherComment'] =
+                      _commentController.text;
                 });
                 Navigator.pop(context);
-                
+
                 // Başarı mesajı göster
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text('${_studentStats[index]['name']} için yorum güncellendi'),
+                    content: Text(
+                      '${_studentStats[index]['name']} için yorum güncellendi',
+                    ),
                     backgroundColor: Colors.green,
                     duration: const Duration(seconds: 2),
                   ),
@@ -232,10 +241,7 @@ class _OgrenciIstatistikPageState extends State<OgrenciIstatistikPage> {
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF1E88E5),
             ),
-            child: const Text(
-              'Kaydet',
-              style: TextStyle(color: Colors.white),
-            ),
+            child: const Text('Kaydet', style: TextStyle(color: Colors.white)),
           ),
         ],
       ),
@@ -497,7 +503,7 @@ class _OgrenciIstatistikPageState extends State<OgrenciIstatistikPage> {
     // İlerleme ortalaması hesapla
     final double averageProgress =
         subjects.map((s) => s['progress'] as double).reduce((a, b) => a + b) /
-            subjects.length;
+        subjects.length;
 
     final String teacherComment = student['teacherComment'] ?? '';
 
@@ -639,8 +645,8 @@ class _OgrenciIstatistikPageState extends State<OgrenciIstatistikPage> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    teacherComment.isNotEmpty 
-                        ? teacherComment 
+                    teacherComment.isNotEmpty
+                        ? teacherComment
                         : 'Henüz yorum eklenmemiş.',
                     style: const TextStyle(
                       fontSize: 13,
@@ -692,10 +698,10 @@ class _OgrenciIstatistikPageState extends State<OgrenciIstatistikPage> {
   }
 
   Widget _buildSubjectProgressItem(
-      Map<String, dynamic> subject,
-      Color color,
-      IconData icon,
-      ) {
+    Map<String, dynamic> subject,
+    Color color,
+    IconData icon,
+  ) {
     final progress = subject['progress'] as double;
 
     return Padding(
