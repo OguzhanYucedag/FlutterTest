@@ -4,10 +4,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'firebase_options.dart';
 import 'kayit.dart';
 import 'kurum/anasayfakurum.dart';
-import 'kurum/anasayfaveli.dart';
+import 'veli/anasayfaveli.dart';
 import 'ogretmen/ogretmen_giris.dart';
-
-final ValueNotifier<ThemeMode> themeNotifier = ValueNotifier(ThemeMode.system);
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -20,26 +18,12 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder<ThemeMode>(
-      valueListenable: themeNotifier,
-      builder: (context, currentMode, child) {
-        return MaterialApp(
-          title: 'Flutter Demo',
-          theme: ThemeData(
-            colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-            useMaterial3: true,
-          ),
-          darkTheme: ThemeData(
-            colorScheme: ColorScheme.fromSeed(
-              seedColor: Colors.deepPurple,
-              brightness: Brightness.dark,
-            ),
-            useMaterial3: true,
-          ),
-          themeMode: currentMode,
-          home: const LoginPage(),
-        );
-      },
+    return MaterialApp(
+      title: 'Flutter Demo',
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+      ),
+      home: const LoginPage(),
     );
   }
 }
