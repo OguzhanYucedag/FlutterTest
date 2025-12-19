@@ -22,6 +22,12 @@
 	<string>????</string>
 	<key>CFBundleVersion</key>
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Günün anısını paylaşmak için galeriye erişim izni gerekiyor.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Günün anısını paylaşmak için kameraya erişim izni gerekiyor.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Video kaydı için mikrofona erişim izni gerekiyor.</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>UILaunchStoryboardName</key>
