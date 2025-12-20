@@ -216,7 +216,7 @@ class _LoginPageState extends State<LoginPage> {
       ),
     );
   }
-
+  //giriş yapma kısmı 
   Future<void> _girisYap() async {
     final email = _emailController.text.trim();
     final sifre = _passwordController.text.trim();
@@ -228,15 +228,31 @@ class _LoginPageState extends State<LoginPage> {
       return;
     }
 
-    final sorgu = await FirebaseFirestore.instance
-        .collection('users')
+    // Önce genel users koleksiyonunda arar
+    final sorguKurumlar = await FirebaseFirestore.instance
+        .collection('kurumlar')
         .where('kullanıcıEmail', isEqualTo: email)
         .where('kullanıcıŞifre', isEqualTo: sifre)
         .limit(1)
         .get();
 
-    if (sorgu.docs.isNotEmpty) {
-      final veri = sorgu.docs.first.data();
+    // Ardından veliler koleksiyonunda ayrı bir kontrol yapılır
+    final sorguVeliler = sorguKurumlar.docs.isNotEmpty
+        ? null
+        : await FirebaseFirestore.instance
+            .collection('veliler')
+            .where('kullanıcıEmail', isEqualTo: email)
+            .where('kullanıcıŞifre', isEqualTo: sifre)
+            .limit(1)
+            .get();
+
+    final veri = sorguKurumlar.docs.isNotEmpty
+        ? sorguKurumlar.docs.first.data()
+        : (sorguVeliler?.docs.isNotEmpty ?? false)
+            ? sorguVeliler!.docs.first.data()
+            : null;
+
+    if (veri != null) {
       final String ad = veri['kullanıcıAd'] ?? '';
       final String tip = veri['tip'] ?? '';
 

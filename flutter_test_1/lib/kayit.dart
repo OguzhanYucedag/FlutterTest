@@ -10,7 +10,7 @@ class KayitPage extends StatefulWidget {
 }
 
 class _KayitPageState extends State<KayitPage> {
-  String ad = '', sifre = '', email = '', sifreTekrar = '';
+  String ad = '', sifre = '', email = '', sifreTekrar = '', veliTel = '';
 
   // Değiştirilebilir hale getirildi
   bool _obscurePassword = true;
@@ -27,6 +27,10 @@ class _KayitPageState extends State<KayitPage> {
 
   sifreAl(sifreTutucu) {
     sifre = sifreTutucu;
+  }
+
+  veliTelAl(String telTutucu) {
+    veliTel = telTutucu;
   }
 
   @override
@@ -49,8 +53,13 @@ class _KayitPageState extends State<KayitPage> {
             ),
           ),
           SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.all(24.0),
+            child: SingleChildScrollView(
+              padding: EdgeInsets.fromLTRB(
+                24,
+                24,
+                24,
+                MediaQuery.of(context).viewInsets.bottom + 24,
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -143,6 +152,27 @@ class _KayitPageState extends State<KayitPage> {
                   ),
                   const SizedBox(height: 32),
 
+                  if (_selectedOption == 1)
+                    Column(
+                      children: [
+                        TextField(
+                          onChanged: veliTelAl,
+                          decoration: const InputDecoration(
+                            labelText: 'Veli Telefon Numarası',
+                            labelStyle: TextStyle(color: Colors.grey),
+                            enabledBorder: UnderlineInputBorder(
+                              borderSide: BorderSide(color: Colors.grey),
+                            ),
+                            focusedBorder: UnderlineInputBorder(
+                              borderSide: BorderSide(color: Colors.blue),
+                            ),
+                          ),
+                          keyboardType: TextInputType.phone,
+                        ),
+                        const SizedBox(height: 32),
+                      ],
+                    ),
+
                   // Şifre
                   TextField(
                     onChanged: sifreAl,
@@ -205,7 +235,8 @@ class _KayitPageState extends State<KayitPage> {
                   ),
                   const SizedBox(height: 24),
 
-                  const Spacer(),
+                  // Spacer cannot be used inside an unbounded ScrollView; simple gap instead
+                  const SizedBox(height: 24),
 
                   // Kurum / Veli butonları
                   Row(
@@ -329,6 +360,13 @@ class _KayitPageState extends State<KayitPage> {
       return;
     }
 
+    if (_selectedOption == 1 && veliTel.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Lütfen veli telefon numarasını girin')),
+      );
+      return;
+    }
+
     if (sifre != sifreTekrar) {
       ScaffoldMessenger.of(
         context,
@@ -336,9 +374,10 @@ class _KayitPageState extends State<KayitPage> {
       return;
     }
 
-    const String collection = 'users';
+    //const String collection = 'users';
     final String adEtiketi = _selectedOption == 0 ? 'kurum adı' : 'veli adı';
     final String tip = _selectedOption == 0 ? 'kurum' : 'veli';
+    final String collection = _selectedOption == 0 ? 'kurumlar' : 'veliler';
 
     final bool adKayitli = await _kayitVarMi(collection, 'kullanıcıAd', ad);
     if (adKayitli) {
@@ -362,7 +401,7 @@ class _KayitPageState extends State<KayitPage> {
       return;
     }
 
-    final Map<String, dynamic> kurumlar = {
+    final Map<String, dynamic> kullanicilar = {
       "kullanıcıAd": ad,
       "kullanıcıEmail": email,
       "kullanıcıŞifre": sifre,
@@ -370,9 +409,13 @@ class _KayitPageState extends State<KayitPage> {
       "olusturmaZamani": FieldValue.serverTimestamp(),
     };
 
+    if (_selectedOption == 1) {
+      kullanicilar["veliTelefon"] = veliTel;
+    }
+
     FirebaseFirestore.instance
         .collection(collection)
-        .add(kurumlar)
+        .add(kullanicilar)
         .then((_) {
           if (!mounted) return;
           ScaffoldMessenger.of(context).showSnackBar(
