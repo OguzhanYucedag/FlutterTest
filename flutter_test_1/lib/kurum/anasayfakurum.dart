@@ -179,7 +179,9 @@ class AnasayfaPageKurum extends StatelessWidget {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const OgretmenAyarlariPage(),
+                            builder: (context) => OgretmenAyarlariPage(
+                              baglikurum: ad,
+                            ),
                           ),
                         );
                       },
@@ -199,7 +201,9 @@ class AnasayfaPageKurum extends StatelessWidget {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const OgrenciAyarlariPage(),
+                            builder: (context) => OgrenciAyarlariPage(
+                              baglikurum: ad,
+                            ),
                           ),
                         );
                       },
