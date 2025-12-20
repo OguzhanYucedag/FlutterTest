@@ -228,7 +228,7 @@ class _LoginPageState extends State<LoginPage> {
       return;
     }
 
-    // Önce genel users koleksiyonunda arar
+    // Önce genel kurumlar koleksiyonunda arar
     final sorguKurumlar = await FirebaseFirestore.instance
         .collection('kurumlar')
         .where('kullanıcıEmail', isEqualTo: email)
@@ -245,12 +245,23 @@ class _LoginPageState extends State<LoginPage> {
             .where('kullanıcıŞifre', isEqualTo: sifre)
             .limit(1)
             .get();
+    
+    final sorguOgretmenler = sorguKurumlar.docs.isNotEmpty
+        ? null
+        : await FirebaseFirestore.instance
+            .collection('ogretmenler')
+            .where('kullanıcıEmail', isEqualTo: email)
+            .where('kullanıcıŞifre', isEqualTo: sifre)
+            .limit(1)
+            .get();
 
     final veri = sorguKurumlar.docs.isNotEmpty
         ? sorguKurumlar.docs.first.data()
         : (sorguVeliler?.docs.isNotEmpty ?? false)
             ? sorguVeliler!.docs.first.data()
-            : null;
+            : (sorguOgretmenler?.docs.isNotEmpty ?? false)
+                ? sorguOgretmenler!.docs.first.data()
+                : null;
 
     if (veri != null) {
       final String ad = veri['kullanıcıAd'] ?? '';

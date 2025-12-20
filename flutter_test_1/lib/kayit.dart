@@ -401,6 +401,21 @@ class _KayitPageState extends State<KayitPage> {
       return;
     }
 
+    if (_selectedOption == 1) {
+      final bool veliTelKayitli = await veliTelVarmi(veliTel);
+      if (veliTelKayitli) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(
+          const SnackBar(
+            content: Text('Bu veli telefon numarası zaten kayıtlı'),
+          ),
+        );
+        return;
+      }
+    }
+
     final Map<String, dynamic> kullanicilar = {
       "kullanıcıAd": ad,
       "kullanıcıEmail": email,
@@ -439,6 +454,15 @@ class _KayitPageState extends State<KayitPage> {
     final sorgu = await FirebaseFirestore.instance
         .collection(collection)
         .where(alan, isEqualTo: deger)
+        .limit(1)
+        .get();
+    return sorgu.docs.isNotEmpty;
+  }
+
+  Future<bool> veliTelVarmi(String telefon) async {
+    final sorgu = await FirebaseFirestore.instance
+        .collection('veliler')
+        .where('veliTelefon', isEqualTo: telefon)
         .limit(1)
         .get();
     return sorgu.docs.isNotEmpty;

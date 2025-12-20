@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
 class OgrencilerimPage extends StatefulWidget {
-  const OgrencilerimPage({super.key});
+  const OgrencilerimPage({super.key, required this.ad});
+
+  final String ad;
 
   @override
   State<OgrencilerimPage> createState() => _OgrencilerimPageState();
@@ -10,14 +12,7 @@ class OgrencilerimPage extends StatefulWidget {
 class _OgrencilerimPageState extends State<OgrencilerimPage> {
   // Öğrenci verileri
   final List<Map<String, dynamic>> _students = [
-    {
-      'name': 'Ahmet Yılmaz',
-      'parent': 'Mehmet Yılmaz',
-      'phone': '0555 111 22 33',
-      'id': '12345678901',
-      'avatarColor': Colors.blue,
-      'avatarIcon': Icons.person,
-    },
+    
     {
       'name': 'Ayşe Kaya',
       'parent': 'Fatma Kaya',
@@ -25,46 +20,6 @@ class _OgrencilerimPageState extends State<OgrencilerimPage> {
       'id': '12345678902',
       'avatarColor': Colors.purple,
       'avatarIcon': Icons.school,
-    },
-    {
-      'name': 'Can Yıldız',
-      'parent': 'Ali Yıldız',
-      'phone': '0555 333 44 55',
-      'id': '12345678903',
-      'avatarColor': Colors.teal,
-      'avatarIcon': Icons.auto_stories,
-    },
-    {
-      'name': 'Zeynep Çelik',
-      'parent': 'Ayşe Çelik',
-      'phone': '0555 444 55 66',
-      'id': '12345678904',
-      'avatarColor': Colors.orange,
-      'avatarIcon': Icons.person,
-    },
-    {
-      'name': 'Mehmet Demir',
-      'parent': 'Hasan Demir',
-      'phone': '0555 555 66 77',
-      'id': '12345678905',
-      'avatarColor': Colors.green,
-      'avatarIcon': Icons.school,
-    },
-    {
-      'name': 'Elif Öztürk',
-      'parent': 'Zehra Öztürk',
-      'phone': '0555 666 77 88',
-      'id': '12345678906',
-      'avatarColor': Colors.red,
-      'avatarIcon': Icons.auto_stories,
-    },
-    {
-      'name': 'Burak Şahin',
-      'parent': 'Murat Şahin',
-      'phone': '0555 777 88 99',
-      'id': '12345678907',
-      'avatarColor': Colors.indigo,
-      'avatarIcon': Icons.person,
     },
   ];
 
@@ -89,20 +44,35 @@ class _OgrencilerimPageState extends State<OgrencilerimPage> {
               expandedTitleScale: 1.4,
               titlePadding: const EdgeInsets.only(bottom: 16, left: 20),
               centerTitle: false,
-              title: const Text(
-                'Öğrencilerim',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.w800,
-                  color: Colors.white,
-                  shadows: [
-                    Shadow(
-                      color: Colors.black26,
-                      blurRadius: 4,
-                      offset: Offset(0, 2),
+              title: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    widget.ad,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white70,
                     ),
-                  ],
-                ),
+                  ),
+                  const SizedBox(height: 4),
+                  const Text(
+                    'Öğrencilerim',
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.w800,
+                      color: Colors.white,
+                      shadows: [
+                        Shadow(
+                          color: Colors.black26,
+                          blurRadius: 4,
+                          offset: Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
               background: Container(
                 decoration: BoxDecoration(
