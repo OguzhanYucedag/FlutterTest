@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class OdevlerimVeli extends StatefulWidget {
   final String? ogrenciAdi;
   final String? sinif;
-  
+
   const OdevlerimVeli({super.key, this.ogrenciAdi, this.sinif});
 
   @override
@@ -14,7 +14,7 @@ class _OdevlerimVeliState extends State<OdevlerimVeli>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   String? _selectedDers;
-  
+
   final List<Map<String, dynamic>> _akademikAlanlar = [
     {
       'id': 1,
@@ -98,10 +98,7 @@ class _OdevlerimVeliState extends State<OdevlerimVeli>
             if (widget.ogrenciAdi != null)
               Text(
                 widget.ogrenciAdi!,
-                style: const TextStyle(
-                  color: Colors.white70,
-                  fontSize: 12,
-                ),
+                style: const TextStyle(color: Colors.white70, fontSize: 12),
               ),
           ],
         ),
@@ -130,7 +127,7 @@ class _OdevlerimVeliState extends State<OdevlerimVeli>
         children: [
           // Ders Filtreleme Alanı
           _buildDersFiltreleme(),
-          
+
           // TabBarView Alanı
           Expanded(
             child: TabBarView(
@@ -172,7 +169,7 @@ class _OdevlerimVeliState extends State<OdevlerimVeli>
               itemBuilder: (context, index) {
                 final alan = _akademikAlanlar[index];
                 final isSelected = _selectedDers == alan['ad'];
-                
+
                 return Padding(
                   padding: const EdgeInsets.only(right: 8),
                   child: FilterChip(
@@ -196,9 +193,7 @@ class _OdevlerimVeliState extends State<OdevlerimVeli>
                     ),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
-                      side: BorderSide(
-                        color: alan['renk'].withOpacity(0.3),
-                      ),
+                      side: BorderSide(color: alan['renk'].withOpacity(0.3)),
                     ),
                     elevation: isSelected ? 2 : 0,
                     shadowColor: alan['renk'].withOpacity(0.2),
@@ -214,7 +209,9 @@ class _OdevlerimVeliState extends State<OdevlerimVeli>
 
   Widget _buildOdevList({required bool isTamamlandi}) {
     // Filtrelenmiş ödev verileri
-    final List<Map<String, dynamic>> odevler = _getFilteredOdevler(isTamamlandi);
+    final List<Map<String, dynamic>> odevler = _getFilteredOdevler(
+      isTamamlandi,
+    );
 
     if (odevler.isEmpty) {
       return Center(
@@ -239,7 +236,7 @@ class _OdevlerimVeliState extends State<OdevlerimVeli>
                 "Filtre: $_selectedDers",
                 style: TextStyle(color: Colors.grey[500], fontSize: 14),
               ),
-            ]
+            ],
           ],
         ),
       );
@@ -316,9 +313,7 @@ class _OdevlerimVeliState extends State<OdevlerimVeli>
 
     // Ders filtresi uygula
     if (_selectedDers != null) {
-      return allOdevler
-          .where((odev) => odev['ders'] == _selectedDers)
-          .toList();
+      return allOdevler.where((odev) => odev['ders'] == _selectedDers).toList();
     }
 
     return allOdevler;
@@ -381,7 +376,7 @@ class _OdevlerimVeliState extends State<OdevlerimVeli>
                   ),
                 ),
                 const SizedBox(width: 12),
-                
+
                 // Ders Adı
                 Expanded(
                   child: Text(
@@ -393,7 +388,7 @@ class _OdevlerimVeliState extends State<OdevlerimVeli>
                     ),
                   ),
                 ),
-                
+
                 // Tarih
                 Container(
                   padding: const EdgeInsets.symmetric(
@@ -417,7 +412,7 @@ class _OdevlerimVeliState extends State<OdevlerimVeli>
               ],
             ),
           ),
-          
+
           // İçerik
           Padding(
             padding: const EdgeInsets.all(16),
@@ -434,7 +429,7 @@ class _OdevlerimVeliState extends State<OdevlerimVeli>
                   ),
                 ),
                 const SizedBox(height: 8),
-                
+
                 // Açıklama
                 Text(
                   odev['aciklama'],
@@ -444,7 +439,7 @@ class _OdevlerimVeliState extends State<OdevlerimVeli>
                     height: 1.4,
                   ),
                 ),
-                
+
                 // Öğretmen Notu (sadece tamamlananlar için)
                 if (isTamamlandi && odev.containsKey('not')) ...[
                   const SizedBox(height: 16),
@@ -485,29 +480,74 @@ class _OdevlerimVeliState extends State<OdevlerimVeli>
               ],
             ),
           ),
-          
+
           // Action Butonu (sadece bekleyenler için)
           if (!isTamamlandi)
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-              child: SizedBox(
-                width: double.infinity,
-                child: ElevatedButton.icon(
-                  onPressed: () {
-                    _odeviTamamlaDialog(odev);
-                  },
-                  icon: const Icon(Icons.check_circle_outline, size: 20),
-                  label: const Text("Ödevi Tamamla"),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: color,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+              child: Column(
+                children: [
+                  const Text(
+                    "Ödev yapıldı mı?",
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87,
                     ),
                   ),
-                ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      // Evet Button
+                      Expanded(
+                        child: ElevatedButton.icon(
+                          onPressed: () {
+                            _odeviTamamlaDialog(odev);
+                          },
+                          icon: const Icon(Icons.check, size: 18),
+                          label: const Text("Evet"),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.green,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 10),
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      // Hayır Button
+                      Expanded(
+                        child: ElevatedButton.icon(
+                          onPressed: () {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text(
+                                  "Ödev henüz yapılmadı olarak işaretlendi.",
+                                ),
+                                backgroundColor: Colors.orange,
+                                duration: Duration(seconds: 2),
+                              ),
+                            );
+                          },
+                          icon: const Icon(Icons.close, size: 18),
+                          label: const Text("Hayır"),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.red,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 10),
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ),
         ],
@@ -535,10 +575,7 @@ class _OdevlerimVeliState extends State<OdevlerimVeli>
           children: [
             Text(
               odev['baslik'],
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
-              ),
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
             ),
             const SizedBox(height: 8),
             Text(
@@ -557,7 +594,9 @@ class _OdevlerimVeliState extends State<OdevlerimVeli>
               Navigator.pop(context);
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: Text("${odev['baslik']} ödevi tamamlandı olarak işaretlendi"),
+                  content: Text(
+                    "${odev['baslik']} ödevi tamamlandı olarak işaretlendi",
+                  ),
                   backgroundColor: Colors.green,
                 ),
               );
