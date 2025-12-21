@@ -2,7 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class OgretmenAyarlariPage extends StatefulWidget {
-  const OgretmenAyarlariPage({super.key});
+  const OgretmenAyarlariPage({super.key, this.baglikurum});
+
+  final String? baglikurum;
 
   @override
   State<OgretmenAyarlariPage> createState() => _OgretmenAyarlariPageState();
@@ -584,12 +586,13 @@ class _OgretmenAyarlariPageState extends State<OgretmenAyarlariPage> {
       'kullanıcıEmail': email,
       'kullanıcıNumara': numara,
       'kullanıcıŞifre': sifre,
+      'bagliOlduguKurum': widget.baglikurum ?? '',
       'tip': 'ogretmen',
       'olusturmaZamani': FieldValue.serverTimestamp(),
     };
 
     try {
-      await FirebaseFirestore.instance.collection('users').add(ogretmenVerisi);
+      await FirebaseFirestore.instance.collection('ogretmenler').add(ogretmenVerisi);//ogretmenler koleksiyonuna ekle
 
       if (!mounted) return;
 
@@ -626,7 +629,7 @@ class _OgretmenAyarlariPageState extends State<OgretmenAyarlariPage> {
 
   Future<bool> _emailVarMi(String email) async {
     final sorgu = await FirebaseFirestore.instance
-        .collection('users')
+        .collection('ogretmenler')//ogretmenler koleksiyonuna bakacak email kontrolü yapılacak. ama bir öğretmen tek yerde çalışmalı
         .where('kullanıcıEmail', isEqualTo: email)
         .limit(1)
         .get();
@@ -640,8 +643,9 @@ class _OgretmenAyarlariPageState extends State<OgretmenAyarlariPage> {
 
     try {
       final sorgu = await FirebaseFirestore.instance
-          .collection('users')
+          .collection('ogretmenler')//ogretmenler
           .where('tip', isEqualTo: 'ogretmen')
+          .where('bagliOlduguKurum', isEqualTo: widget.baglikurum ?? '')
           .get();
 
       if (!mounted) return;
@@ -676,7 +680,7 @@ class _OgretmenAyarlariPageState extends State<OgretmenAyarlariPage> {
 
   Future<void> _ogretmenSil(String id) async {
     try {
-      await FirebaseFirestore.instance.collection('users').doc(id).delete();
+      await FirebaseFirestore.instance.collection('ogretmenler').doc(id).delete();//ogretmenler koleksiyonuna silinecek.
 
       if (!mounted) return;
       _showSnackBar('Öğretmen başarıyla silindi', Colors.green);

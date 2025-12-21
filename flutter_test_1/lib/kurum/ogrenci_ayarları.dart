@@ -1,7 +1,10 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class OgrenciAyarlariPage extends StatefulWidget {
-  const OgrenciAyarlariPage({super.key});
+  const OgrenciAyarlariPage({super.key, this.baglikurum});
+
+  final String? baglikurum;
 
   @override
   State<OgrenciAyarlariPage> createState() => _OgrenciAyarlariPageState();
@@ -14,6 +17,15 @@ class _OgrenciAyarlariPageState extends State<OgrenciAyarlariPage> {
   final TextEditingController _sifreController = TextEditingController();
 
   bool _obscurePassword = true;
+  bool _isSaving = false;
+  final List<_OgrenciKaydi> _ogrenciler = [];
+  bool _ogrenciListYukleniyor = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _ogrencileriGetir();
+  }
 
   @override
   void dispose() {
@@ -182,6 +194,10 @@ class _OgrenciAyarlariPageState extends State<OgrenciAyarlariPage> {
 
                         // Save Button
                         _buildSaveButton(),
+                        const SizedBox(height: 16),
+
+                        // Kayıtlı öğrenciler listesi
+                        _buildOgrenciListeAlani(),
                       ],
                     ),
                   ),
@@ -275,10 +291,7 @@ class _OgrenciAyarlariPageState extends State<OgrenciAyarlariPage> {
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
-        onPressed: () {
-          // Kaydetme işlemleri buraya
-          // print('Kaydediliyor: ${_adController.text}');
-        },
+        onPressed: _isSaving ? null : veliVarmi,
         style: ElevatedButton.styleFrom(
           backgroundColor: const Color(0xFF4CAF50),
           foregroundColor: Colors.white,
@@ -289,18 +302,219 @@ class _OgrenciAyarlariPageState extends State<OgrenciAyarlariPage> {
           elevation: 2,
           shadowColor: Colors.green.withValues(alpha: 0.3),
         ),
-        child: const Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.save_alt_rounded, size: 20),
-            SizedBox(width: 8),
-            Text(
-              'Kaydet',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+        child: _isSaving
+            ? const SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: Colors.white,
+                ),
+              )
+            : const Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.save_alt_rounded, size: 20),
+                  SizedBox(width: 8),
+                  Text(
+                    'Öğrenci Kaydet',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                  ),
+                ],
+              ),
+      ),
+    );
+  }
+
+  Widget _buildOgrenciListeAlani() {
+    if (_ogrenciListYukleniyor) {
+      return const Center(
+        child: Padding(
+          padding: EdgeInsets.symmetric(vertical: 12),
+          child: CircularProgressIndicator(color: Color(0xFF4CAF50)),
+        ),
+      );
+    }
+
+    if (_ogrenciler.isEmpty) {
+      return const Text(
+        'Bu kuruma ait öğrenci bulunamadı.',
+        style: TextStyle(color: Color(0xFF546E7A)),
+      );
+    }
+
+    return Column(
+      children: _ogrenciler.map(_buildOgrenciSatiri).toList(),
+    );
+  }
+
+  Widget _buildOgrenciSatiri(_OgrenciKaydi ogrenci) {
+    final controller = TextEditingController(text: ogrenci.ad);
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: TextField(
+        controller: controller,
+        readOnly: true,
+        decoration: InputDecoration(
+          labelText: 'Kayıtlı Öğrenci',
+          prefixIcon: const Icon(Icons.person_outline, color: Color(0xFF4CAF50)),
+          suffixIcon: IconButton(
+            icon: const Icon(Icons.remove_circle_outline, color: Colors.red),
+            onPressed: () => _ogrenciSil(ogrenci.id),
+          ),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide(
+              color: const Color(0xFF4CAF50).withValues(alpha: 0.5),
             ),
-          ],
+          ),
+          filled: true,
+          fillColor: const Color(0xFF4CAF50).withValues(alpha: 0.05),
         ),
       ),
     );
   }
+
+  Future<void> veliVarmi() async {
+    final numara = _telefonController.text.trim();
+
+    if (numara.isEmpty) {
+      _showSnackBar('Veli telefon numarası giriniz', Colors.orange);
+      return;
+    }
+
+    setState(() => _isSaving = true);
+
+    try {
+      final sorgu = await FirebaseFirestore.instance
+          .collection('veliler')
+          .where('veliTelefon', isEqualTo: numara)
+          .limit(1)
+          .get();
+
+      if (sorgu.docs.isNotEmpty) {
+        await veriOgrenciEkle();
+      } else {
+        _showSnackBar('Bu telefon numarasına ait veli bulunamadı', Colors.red);
+      }
+    } catch (e) {
+      _showSnackBar('Hata: $e', Colors.red);
+    } finally {
+      if (mounted) {
+        setState(() => _isSaving = false);
+      }
+    }
+  }
+
+  Future<void> veriOgrenciEkle() async {
+    final ad = _adController.text.trim();
+    final soyad = _soyadController.text.trim();
+    final numara = _telefonController.text.trim();
+    final sifre = _sifreController.text.trim();
+
+    if (ad.isEmpty ||
+        soyad.isEmpty ||
+        numara.isEmpty ||
+        sifre.isEmpty) {
+      _showSnackBar('Lütfen tüm alanları doldurun', Colors.orange);
+      return;
+    }
+
+    setState(() => _isSaving = true);
+
+    final Map<String, dynamic> ogrenciVerisi = {
+      'kullanıcıAd': ad,
+      'kullanıcıSoyad': soyad,
+      'VeliNumarası': numara,
+      'kullanıcıŞifre': sifre,
+      'bagliOlduguKurum': widget.baglikurum ?? '',
+      'tip': 'ogrenci',
+      'olusturmaZamani': FieldValue.serverTimestamp(),
+    };
+
+    try {
+      await FirebaseFirestore.instance.collection('ogrenciler').add(ogrenciVerisi);
+
+      if (!mounted) return;
+
+      _showSnackBar('Öğrenci başarıyla eklendi', Colors.green);
+
+      _adController.clear();
+      _soyadController.clear();
+      _telefonController.clear();
+      _sifreController.clear();
+
+      await _ogrencileriGetir();
+    } catch (e) {
+      if (!mounted) return;
+      _showSnackBar('Hata: $e', Colors.red);
+    } finally {
+      if (mounted) {
+        setState(() => _isSaving = false);
+      }
+    }
+  }
+
+  void _showSnackBar(String message, Color color) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: color,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        duration: const Duration(seconds: 2),
+      ),
+    );
+  }
+
+  Future<void> _ogrencileriGetir() async {
+    setState(() => _ogrenciListYukleniyor = true);
+
+    try {
+      final sorgu = await FirebaseFirestore.instance
+          .collection('ogrenciler')
+          .where('bagliOlduguKurum', isEqualTo: widget.baglikurum ?? '')
+          .get();
+
+      if (!mounted) return;
+      setState(() {
+        _ogrenciler
+          ..clear()
+          ..addAll(
+            sorgu.docs
+                .map(
+                  (d) => _OgrenciKaydi(
+                    id: d.id,
+                    ad: (d.data()['kullanıcıAd'] ?? '').toString(),
+                  ),
+                )
+                .toList(),
+          );
+      });
+    } catch (e) {
+      if (!mounted) return;
+      _showSnackBar('Öğrenciler alınamadı: $e', Colors.red);
+    } finally {
+      if (mounted) {
+        setState(() => _ogrenciListYukleniyor = false);
+      }
+    }
+  }
+
+  Future<void> _ogrenciSil(String id) async {
+    try {
+      await FirebaseFirestore.instance.collection('ogrenciler').doc(id).delete();
+      await _ogrencileriGetir();
+      _showSnackBar('Öğrenci silindi', Colors.green);
+    } catch (e) {
+      _showSnackBar('Silme hatası: $e', Colors.red);
+    }
+  }
+}
+
+class _OgrenciKaydi {
+  _OgrenciKaydi({required this.id, required this.ad});
+
+  final String id;
+  final String ad;
 }
