@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class OgrencilerimPage extends StatefulWidget {
@@ -10,18 +11,69 @@ class OgrencilerimPage extends StatefulWidget {
 }
 
 class _OgrencilerimPageState extends State<OgrencilerimPage> {
+  String? bagliOldu;
+
   // Öğrenci verileri
-  final List<Map<String, dynamic>> _students = [
-    
-    {
-      'name': 'Ayşe Kaya',
-      'parent': 'Fatma Kaya',
-      'phone': '0555 222 33 44',
-      'id': '12345678902',
-      'avatarColor': Colors.purple,
-      'avatarIcon': Icons.school,
-    },
-  ];
+  final List<Map<String, dynamic>> _students = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchBagliOlduguKurum();
+  }
+
+  Future<void> _fetchBagliOlduguKurum() async {
+    try {
+      final snap = await FirebaseFirestore.instance
+          .collection('ogretmenler')
+          .where('kullanıcıAd', isEqualTo: widget.ad)
+          .limit(1)
+          .get();
+
+      if (snap.docs.isNotEmpty) {
+        final data = snap.docs.first.data();
+        setState(() {
+          bagliOldu = data['bagliOlduguKurum']?.toString();
+        });
+        await ogrencileriBul(bagliOldu);
+      }
+    } catch (e) {
+      // Sessizce yutmak yerine gerektiğinde loglanabilir.
+      debugPrint('bagliOlduguKurum getirilemedi: $e');
+    }
+  }
+
+  Future<void> ogrencileriBul(String? bagliOldumKurum) async {
+    if (bagliOldumKurum == null || bagliOldumKurum.isEmpty) return;
+
+    try {
+      final snap = await FirebaseFirestore.instance
+          .collection('ogrenciler')
+          .where('bagliOlduguKurum', isEqualTo: bagliOldumKurum)
+          //.where('veliAd', isEqualTo: VeliAd)
+          .get();
+
+      setState(() {
+        _students
+          ..clear()
+          ..addAll(
+            snap.docs.map((doc) {
+              final data = doc.data();
+              return {
+                'name': (data['kullanıcıAd'] ?? '').toString(),
+                'parent': (data['veliAd'] ?? '').toString(),
+                'phone': (data['VeliNumarası'] ?? '').toString(),
+                'id': doc.id,
+                'avatarColor': Colors.purple,
+                'avatarIcon': Icons.school,
+              };
+            }),
+          );
+      });
+    } catch (e) {
+      debugPrint('ogrencileriBul hatası: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
