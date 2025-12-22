@@ -129,13 +129,13 @@ class _OgretmenAyarlariPageState extends State<OgretmenAyarlariPage> {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.blueGrey.withValues(alpha: 0.15),
+            color: Colors.blueGrey.withOpacity(0.15),
             blurRadius: 20,
             offset: const Offset(0, 8),
           ),
         ],
         border: Border.all(
-          color: Colors.green.withValues(alpha: 0.1),
+          color: Colors.green.withOpacity(0.1),
           width: 1,
         ),
       ),
@@ -150,10 +150,10 @@ class _OgretmenAyarlariPageState extends State<OgretmenAyarlariPage> {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF4CAF50).withValues(alpha: 0.1),
+                    color: const Color(0xFF4CAF50).withOpacity(0.1),
                     shape: BoxShape.circle,
                     border: Border.all(
-                      color: const Color(0xFF4CAF50).withValues(alpha: 0.3),
+                      color: const Color(0xFF4CAF50).withOpacity(0.3),
                       width: 2,
                     ),
                   ),
@@ -237,7 +237,7 @@ class _OgretmenAyarlariPageState extends State<OgretmenAyarlariPage> {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: const Color(0xFF4CAF50).withValues(alpha: 0.5),
+          color: const Color(0xFF4CAF50).withOpacity(0.5),
         ),
       ),
       child: TextField(
@@ -254,7 +254,7 @@ class _OgretmenAyarlariPageState extends State<OgretmenAyarlariPage> {
             vertical: 16,
           ),
           filled: true,
-          fillColor: const Color(0xFF4CAF50).withValues(alpha: 0.05),
+          fillColor: const Color(0xFF4CAF50).withOpacity(0.05),
         ),
       ),
     );
@@ -265,7 +265,7 @@ class _OgretmenAyarlariPageState extends State<OgretmenAyarlariPage> {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: const Color(0xFF4CAF50).withValues(alpha: 0.5),
+          color: const Color(0xFF4CAF50).withOpacity(0.5),
         ),
       ),
       child: TextField(
@@ -298,7 +298,7 @@ class _OgretmenAyarlariPageState extends State<OgretmenAyarlariPage> {
             vertical: 16,
           ),
           filled: true,
-          fillColor: const Color(0xFF4CAF50).withValues(alpha: 0.05),
+          fillColor: const Color(0xFF4CAF50).withOpacity(0.05),
         ),
       ),
     );
@@ -317,7 +317,7 @@ class _OgretmenAyarlariPageState extends State<OgretmenAyarlariPage> {
             borderRadius: BorderRadius.circular(12),
           ),
           elevation: 2,
-          shadowColor: Colors.green.withValues(alpha: 0.3),
+          shadowColor: Colors.green.withOpacity(0.3),
         ),
         child: _isSaving
             ? const SizedBox(
@@ -360,7 +360,7 @@ class _OgretmenAyarlariPageState extends State<OgretmenAyarlariPage> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
-              color: const Color(0xFF4CAF50).withValues(alpha: 0.1),
+              color: const Color(0xFF4CAF50).withOpacity(0.1),
               borderRadius: BorderRadius.circular(20),
             ),
             child: Text(
@@ -395,19 +395,19 @@ class _OgretmenAyarlariPageState extends State<OgretmenAyarlariPage> {
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: Colors.blueGrey.withValues(alpha: 0.1),
+              color: Colors.blueGrey.withOpacity(0.1),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
           ],
-          border: Border.all(color: Colors.green.withValues(alpha: 0.1)),
+          border: Border.all(color: Colors.green.withOpacity(0.1)),
         ),
         child: Column(
           children: [
             Icon(
               Icons.group_outlined,
               size: 64,
-              color: Colors.blueGrey.withValues(alpha: 0.3),
+              color: Colors.blueGrey.withOpacity(0.3),
             ),
             const SizedBox(height: 16),
             const Text(
@@ -444,12 +444,12 @@ class _OgretmenAyarlariPageState extends State<OgretmenAyarlariPage> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.blueGrey.withValues(alpha: 0.1),
+            color: Colors.blueGrey.withOpacity(0.1),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
         ],
-        border: Border.all(color: Colors.green.withValues(alpha: 0.1)),
+        border: Border.all(color: Colors.green.withOpacity(0.1)),
       ),
       child: ListTile(
         contentPadding: const EdgeInsets.symmetric(
@@ -468,7 +468,7 @@ class _OgretmenAyarlariPageState extends State<OgretmenAyarlariPage> {
             shape: BoxShape.circle,
             boxShadow: [
               BoxShadow(
-                color: Colors.green.withValues(alpha: 0.2),
+                color: Colors.green.withOpacity(0.2),
                 blurRadius: 8,
                 offset: const Offset(0, 4),
               ),
@@ -501,7 +501,7 @@ class _OgretmenAyarlariPageState extends State<OgretmenAyarlariPage> {
           icon: Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: Colors.red.withValues(alpha: 0.1),
+              color: Colors.red.withOpacity(0.1),
               shape: BoxShape.circle,
             ),
             child: const Icon(

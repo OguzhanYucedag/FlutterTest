@@ -103,13 +103,13 @@ class _OgrenciAyarlariPageState extends State<OgrenciAyarlariPage> {
                     borderRadius: BorderRadius.circular(20),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.green.withValues(alpha: 0.1),
+                        color: Colors.green.withOpacity(0.1),
                         blurRadius: 20,
                         offset: const Offset(0, 8),
                       ),
                     ],
                     border: Border.all(
-                      color: Colors.green.withValues(alpha: 0.1),
+                      color: Colors.green.withOpacity(0.1),
                       width: 1,
                     ),
                   ),
@@ -126,12 +126,12 @@ class _OgrenciAyarlariPageState extends State<OgrenciAyarlariPage> {
                               decoration: BoxDecoration(
                                 color: const Color(
                                   0xFF4CAF50,
-                                ).withValues(alpha: 0.1),
+                                ).withOpacity(0.1),
                                 shape: BoxShape.circle,
                                 border: Border.all(
                                   color: const Color(
                                     0xFF4CAF50,
-                                  ).withValues(alpha: 0.3),
+                                  ).withOpacity(0.3),
                                   width: 2,
                                 ),
                               ),
@@ -220,7 +220,7 @@ class _OgrenciAyarlariPageState extends State<OgrenciAyarlariPage> {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: const Color(0xFF4CAF50).withValues(alpha: 0.5),
+          color: const Color(0xFF4CAF50).withOpacity(0.5),
         ),
       ),
       child: TextField(
@@ -237,7 +237,7 @@ class _OgrenciAyarlariPageState extends State<OgrenciAyarlariPage> {
             vertical: 16,
           ),
           filled: true,
-          fillColor: const Color(0xFF4CAF50).withValues(alpha: 0.05),
+          fillColor: const Color(0xFF4CAF50).withOpacity(0.05),
         ),
       ),
     );
@@ -248,7 +248,7 @@ class _OgrenciAyarlariPageState extends State<OgrenciAyarlariPage> {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: const Color(0xFF4CAF50).withValues(alpha: 0.5),
+          color: const Color(0xFF4CAF50).withOpacity(0.5),
         ),
       ),
       child: TextField(
@@ -281,7 +281,7 @@ class _OgrenciAyarlariPageState extends State<OgrenciAyarlariPage> {
             vertical: 16,
           ),
           filled: true,
-          fillColor: const Color(0xFF4CAF50).withValues(alpha: 0.05),
+          fillColor: const Color(0xFF4CAF50).withOpacity(0.05),
         ),
       ),
     );
@@ -300,7 +300,7 @@ class _OgrenciAyarlariPageState extends State<OgrenciAyarlariPage> {
             borderRadius: BorderRadius.circular(12),
           ),
           elevation: 2,
-          shadowColor: Colors.green.withValues(alpha: 0.3),
+          shadowColor: Colors.green.withOpacity(0.3),
         ),
         child: _isSaving
             ? const SizedBox(
@@ -365,11 +365,11 @@ class _OgrenciAyarlariPageState extends State<OgrenciAyarlariPage> {
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
             borderSide: BorderSide(
-              color: const Color(0xFF4CAF50).withValues(alpha: 0.5),
+              color: const Color(0xFF4CAF50).withOpacity(0.5),
             ),
           ),
           filled: true,
-          fillColor: const Color(0xFF4CAF50).withValues(alpha: 0.05),
+          fillColor: const Color(0xFF4CAF50).withOpacity(0.05),
         ),
       ),
     );
@@ -377,7 +377,7 @@ class _OgrenciAyarlariPageState extends State<OgrenciAyarlariPage> {
 
   Future<void> veliVarmi() async {
     final numara = _telefonController.text.trim();
-
+    //final veliAd = _adController.text.trim();
     if (numara.isEmpty) {
       _showSnackBar('Veli telefon numarası giriniz', Colors.orange);
       return;
@@ -389,6 +389,7 @@ class _OgrenciAyarlariPageState extends State<OgrenciAyarlariPage> {
       final sorgu = await FirebaseFirestore.instance
           .collection('veliler')
           .where('veliTelefon', isEqualTo: numara)
+          //.where('kullanıcıAd', isEqualTo: veliAd)
           .limit(1)
           .get();
 
@@ -411,7 +412,6 @@ class _OgrenciAyarlariPageState extends State<OgrenciAyarlariPage> {
     final soyad = _soyadController.text.trim();
     final numara = _telefonController.text.trim();
     final sifre = _sifreController.text.trim();
-
     if (ad.isEmpty ||
         soyad.isEmpty ||
         numara.isEmpty ||
@@ -422,9 +422,31 @@ class _OgrenciAyarlariPageState extends State<OgrenciAyarlariPage> {
 
     setState(() => _isSaving = true);
 
+    late String veliAd;
+    try {
+      final veliSorgu = await FirebaseFirestore.instance
+          .collection('veliler')
+          .where('veliTelefon', isEqualTo: numara)
+          .limit(1)
+          .get();
+
+      if (veliSorgu.docs.isEmpty) {
+        _showSnackBar('Bu numaraya ait veli bulunamadı', Colors.red);
+        if (mounted) setState(() => _isSaving = false);
+        return;
+      }
+
+      veliAd = (veliSorgu.docs.first.data()['kullanıcıAd'] ?? '').toString();
+    } catch (e) {
+      _showSnackBar('Veli bilgisi alınamadı: $e', Colors.red);
+      if (mounted) setState(() => _isSaving = false);
+      return;
+    }
+
     final Map<String, dynamic> ogrenciVerisi = {
       'kullanıcıAd': ad,
       'kullanıcıSoyad': soyad,
+      'veliAd': veliAd,
       'VeliNumarası': numara,
       'kullanıcıŞifre': sifre,
       'bagliOlduguKurum': widget.baglikurum ?? '',
