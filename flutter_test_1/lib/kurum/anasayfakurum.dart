@@ -52,15 +52,15 @@ class AnasayfaPageKurum extends StatelessWidget {
                           vertical: 10,
                         ),
                         decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.2),
+                          color: Colors.white.withOpacity(0.2),
                           borderRadius: BorderRadius.circular(25),
                           border: Border.all(
-                            color: Colors.white.withValues(alpha: 0.5),
+                            color: Colors.white.withOpacity(0.5),
                             width: 1.5,
                           ),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.1),
+                              color: Colors.black.withOpacity(0.1),
                               blurRadius: 8,
                               offset: const Offset(0, 4),
                             ),
@@ -97,13 +97,13 @@ class AnasayfaPageKurum extends StatelessWidget {
                     borderRadius: BorderRadius.circular(20),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.blueGrey.withValues(alpha: 0.1),
+                        color: Colors.blueGrey.withOpacity(0.1),
                         blurRadius: 20,
                         offset: const Offset(0, 10),
                       ),
                     ],
                     border: Border.all(
-                      color: Colors.blue.withValues(alpha: 0.1),
+                      color: Colors.blue.withOpacity(0.1),
                       width: 1,
                     ),
                   ),
@@ -117,7 +117,7 @@ class AnasayfaPageKurum extends StatelessWidget {
                             decoration: BoxDecoration(
                               color: const Color(
                                 0xFF1E88E5,
-                              ).withValues(alpha: 0.1),
+                              ).withOpacity(0.1),
                               shape: BoxShape.circle,
                             ),
                             child: const Icon(
@@ -302,7 +302,7 @@ class AnasayfaPageKurum extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.blueGrey.withValues(alpha: 0.1),
+            color: Colors.blueGrey.withOpacity(0.1),
             blurRadius: 15,
             offset: const Offset(0, 8),
           ),
@@ -319,7 +319,7 @@ class AnasayfaPageKurum extends StatelessWidget {
               color: Colors.white,
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
-                color: Colors.grey.withValues(alpha: 0.1),
+                color: Colors.grey.withOpacity(0.1),
                 width: 1,
               ),
             ),
@@ -333,7 +333,7 @@ class AnasayfaPageKurum extends StatelessWidget {
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
-                        color: gradient.colors[1].withValues(alpha: 0.3),
+                        color: gradient.colors[1].withOpacity(0.3),
                         blurRadius: 10,
                         offset: const Offset(0, 5),
                       ),
@@ -370,7 +370,7 @@ class AnasayfaPageKurum extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: Colors.grey.withValues(alpha: 0.1),
+                    color: Colors.grey.withOpacity(0.1),
                     shape: BoxShape.circle,
                   ),
                   child: Icon(

@@ -101,7 +101,7 @@ class _OgretmenPlanPageState extends State<OgretmenPlanPage> {
                         Container(
                           padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
-                            color: Colors.teal.withValues(alpha: 0.1),
+                            color: Colors.teal.withOpacity(0.1),
                             shape: BoxShape.circle,
                           ),
                           child: const Icon(
@@ -137,7 +137,7 @@ class _OgretmenPlanPageState extends State<OgretmenPlanPage> {
                         ),
                         prefixIcon: const Icon(Icons.title, color: Colors.teal),
                         filled: true,
-                        fillColor: Colors.teal.withValues(alpha: 0.05),
+                        fillColor: Colors.teal.withOpacity(0.05),
                       ),
                     ),
                     const SizedBox(height: 16),
@@ -159,7 +159,7 @@ class _OgretmenPlanPageState extends State<OgretmenPlanPage> {
                           color: Colors.teal,
                         ),
                         filled: true,
-                        fillColor: Colors.teal.withValues(alpha: 0.05),
+                        fillColor: Colors.teal.withOpacity(0.05),
                       ),
                       onTap: () async {
                         final TimeOfDay? picked = await showTimePicker(
@@ -274,7 +274,7 @@ class _OgretmenPlanPageState extends State<OgretmenPlanPage> {
                               borderRadius: BorderRadius.circular(12),
                             ),
                             elevation: 2,
-                            shadowColor: Colors.teal.withValues(alpha: 0.3),
+                            shadowColor: Colors.teal.withOpacity(0.3),
                           ),
                           child: const Text('Ekle'),
                         ),
@@ -315,7 +315,7 @@ class _OgretmenPlanPageState extends State<OgretmenPlanPage> {
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.teal.withValues(alpha: 0.4),
+                color: Colors.teal.withOpacity(0.4),
                 blurRadius: 10,
                 offset: const Offset(0, 4),
               ),
@@ -330,7 +330,7 @@ class _OgretmenPlanPageState extends State<OgretmenPlanPage> {
             expandedHeight: 180,
             pinned: true,
             elevation: 10,
-            shadowColor: Colors.teal.withValues(alpha: 0.3),
+            shadowColor: Colors.teal.withOpacity(0.3),
             shape: const ContinuousRectangleBorder(
               borderRadius: BorderRadius.only(
                 bottomLeft: Radius.circular(40),
@@ -384,7 +384,7 @@ class _OgretmenPlanPageState extends State<OgretmenPlanPage> {
                       end: Alignment.bottomCenter,
                       colors: [
                         Colors.transparent,
-                        Colors.black.withValues(alpha: 0.1),
+                        Colors.black.withOpacity(0.1),
                       ],
                     ),
                   ),
@@ -395,7 +395,7 @@ class _OgretmenPlanPageState extends State<OgretmenPlanPage> {
               icon: Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.2),
+                  color: Colors.white.withOpacity(0.2),
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(
@@ -419,14 +419,14 @@ class _OgretmenPlanPageState extends State<OgretmenPlanPage> {
                       borderRadius: BorderRadius.circular(25),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.teal.withValues(alpha: 0.15),
+                          color: Colors.teal.withOpacity(0.15),
                           blurRadius: 25,
                           spreadRadius: 0,
                           offset: const Offset(0, 10),
                         ),
                       ],
                       border: Border.all(
-                        color: Colors.teal.withValues(alpha: 0.1),
+                        color: Colors.teal.withOpacity(0.1),
                         width: 1.5,
                       ),
                     ),
@@ -476,7 +476,7 @@ class _OgretmenPlanPageState extends State<OgretmenPlanPage> {
                         leftChevronIcon: Container(
                           padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
-                            color: Colors.teal.withValues(alpha: 0.1),
+                            color: Colors.teal.withOpacity(0.1),
                             shape: BoxShape.circle,
                           ),
                           child: const Icon(
@@ -488,7 +488,7 @@ class _OgretmenPlanPageState extends State<OgretmenPlanPage> {
                         rightChevronIcon: Container(
                           padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
-                            color: Colors.teal.withValues(alpha: 0.1),
+                            color: Colors.teal.withOpacity(0.1),
                             shape: BoxShape.circle,
                           ),
                           child: const Icon(
@@ -500,7 +500,7 @@ class _OgretmenPlanPageState extends State<OgretmenPlanPage> {
                       ),
                       calendarStyle: CalendarStyle(
                         todayDecoration: BoxDecoration(
-                          color: Colors.teal.withValues(alpha: 0.3),
+                          color: Colors.teal.withOpacity(0.3),
                           shape: BoxShape.circle,
                         ),
                         todayTextStyle: const TextStyle(
@@ -549,12 +549,12 @@ class _OgretmenPlanPageState extends State<OgretmenPlanPage> {
                       gradient: LinearGradient(
                         colors: [
                           Colors.white,
-                          Colors.teal.withValues(alpha: 0.05),
+                          Colors.teal.withOpacity(0.05),
                         ],
                       ),
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(
-                        color: Colors.teal.withValues(alpha: 0.1),
+                        color: Colors.teal.withOpacity(0.1),
                         width: 1.5,
                       ),
                     ),
@@ -569,7 +569,7 @@ class _OgretmenPlanPageState extends State<OgretmenPlanPage> {
                             shape: BoxShape.circle,
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.teal.withValues(alpha: 0.3),
+                                color: Colors.teal.withOpacity(0.3),
                                 blurRadius: 10,
                                 offset: const Offset(0, 4),
                               ),
@@ -625,7 +625,7 @@ class _OgretmenPlanPageState extends State<OgretmenPlanPage> {
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(20),
                         border: Border.all(
-                          color: Colors.teal.withValues(alpha: 0.1),
+                          color: Colors.teal.withOpacity(0.1),
                           width: 1.5,
                         ),
                       ),
@@ -634,7 +634,7 @@ class _OgretmenPlanPageState extends State<OgretmenPlanPage> {
                           Icon(
                             Icons.event_busy_rounded,
                             size: 64,
-                            color: Colors.teal.withValues(alpha: 0.3),
+                            color: Colors.teal.withOpacity(0.3),
                           ),
                           const SizedBox(height: 16),
                           const Text(
@@ -702,12 +702,12 @@ class _OgretmenPlanPageState extends State<OgretmenPlanPage> {
         borderRadius: BorderRadius.circular(18),
         boxShadow: [
           BoxShadow(
-            color: Colors.teal.withValues(alpha: 0.08),
+            color: Colors.teal.withOpacity(0.08),
             blurRadius: 15,
             offset: const Offset(0, 5),
           ),
         ],
-        border: Border.all(color: color.withValues(alpha: 0.2), width: 1),
+        border: Border.all(color: color.withOpacity(0.2), width: 1),
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(18),
@@ -728,8 +728,8 @@ class _OgretmenPlanPageState extends State<OgretmenPlanPage> {
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         colors: [
-                          color.withValues(alpha: 0.9),
-                          color.withValues(alpha: 0.7),
+                          color.withOpacity(0.9),
+                          color.withOpacity(0.7),
                         ],
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
@@ -737,7 +737,7 @@ class _OgretmenPlanPageState extends State<OgretmenPlanPage> {
                       borderRadius: BorderRadius.circular(12),
                       boxShadow: [
                         BoxShadow(
-                          color: color.withValues(alpha: 0.3),
+                          color: color.withOpacity(0.3),
                           blurRadius: 8,
                           offset: const Offset(0, 3),
                         ),
@@ -784,7 +784,7 @@ class _OgretmenPlanPageState extends State<OgretmenPlanPage> {
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: color.withValues(alpha: 0.1),
+                      color: color.withOpacity(0.1),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(

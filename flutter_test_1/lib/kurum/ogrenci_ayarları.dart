@@ -103,13 +103,13 @@ class _OgrenciAyarlariPageState extends State<OgrenciAyarlariPage> {
                     borderRadius: BorderRadius.circular(20),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.green.withValues(alpha: 0.1),
+                        color: Colors.green.withOpacity(0.1),
                         blurRadius: 20,
                         offset: const Offset(0, 8),
                       ),
                     ],
                     border: Border.all(
-                      color: Colors.green.withValues(alpha: 0.1),
+                      color: Colors.green.withOpacity(0.1),
                       width: 1,
                     ),
                   ),
@@ -126,12 +126,12 @@ class _OgrenciAyarlariPageState extends State<OgrenciAyarlariPage> {
                               decoration: BoxDecoration(
                                 color: const Color(
                                   0xFF4CAF50,
-                                ).withValues(alpha: 0.1),
+                                ).withOpacity(0.1),
                                 shape: BoxShape.circle,
                                 border: Border.all(
                                   color: const Color(
                                     0xFF4CAF50,
-                                  ).withValues(alpha: 0.3),
+                                  ).withOpacity(0.3),
                                   width: 2,
                                 ),
                               ),
@@ -220,7 +220,7 @@ class _OgrenciAyarlariPageState extends State<OgrenciAyarlariPage> {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: const Color(0xFF4CAF50).withValues(alpha: 0.5),
+          color: const Color(0xFF4CAF50).withOpacity(0.5),
         ),
       ),
       child: TextField(
@@ -237,7 +237,7 @@ class _OgrenciAyarlariPageState extends State<OgrenciAyarlariPage> {
             vertical: 16,
           ),
           filled: true,
-          fillColor: const Color(0xFF4CAF50).withValues(alpha: 0.05),
+          fillColor: const Color(0xFF4CAF50).withOpacity(0.05),
         ),
       ),
     );
@@ -248,7 +248,7 @@ class _OgrenciAyarlariPageState extends State<OgrenciAyarlariPage> {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: const Color(0xFF4CAF50).withValues(alpha: 0.5),
+          color: const Color(0xFF4CAF50).withOpacity(0.5),
         ),
       ),
       child: TextField(
@@ -281,7 +281,7 @@ class _OgrenciAyarlariPageState extends State<OgrenciAyarlariPage> {
             vertical: 16,
           ),
           filled: true,
-          fillColor: const Color(0xFF4CAF50).withValues(alpha: 0.05),
+          fillColor: const Color(0xFF4CAF50).withOpacity(0.05),
         ),
       ),
     );
@@ -300,7 +300,7 @@ class _OgrenciAyarlariPageState extends State<OgrenciAyarlariPage> {
             borderRadius: BorderRadius.circular(12),
           ),
           elevation: 2,
-          shadowColor: Colors.green.withValues(alpha: 0.3),
+          shadowColor: Colors.green.withOpacity(0.3),
         ),
         child: _isSaving
             ? const SizedBox(
@@ -365,11 +365,11 @@ class _OgrenciAyarlariPageState extends State<OgrenciAyarlariPage> {
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
             borderSide: BorderSide(
-              color: const Color(0xFF4CAF50).withValues(alpha: 0.5),
+              color: const Color(0xFF4CAF50).withOpacity(0.5),
             ),
           ),
           filled: true,
-          fillColor: const Color(0xFF4CAF50).withValues(alpha: 0.05),
+          fillColor: const Color(0xFF4CAF50).withOpacity(0.05),
         ),
       ),
     );

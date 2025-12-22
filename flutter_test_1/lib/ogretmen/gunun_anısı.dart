@@ -91,7 +91,7 @@ class _GununAnisiState extends State<GununAnisi> {
             pinned: true,
             floating: false,
             elevation: 10,
-            shadowColor: Colors.orange.withValues(alpha: 0.3),
+            shadowColor: Colors.orange.withOpacity(0.3),
             shape: const ContinuousRectangleBorder(
               borderRadius: BorderRadius.only(
                 bottomLeft: Radius.circular(40),
@@ -145,7 +145,7 @@ class _GununAnisiState extends State<GununAnisi> {
                       end: Alignment.bottomCenter,
                       colors: [
                         Colors.transparent,
-                        Colors.black.withValues(alpha: 0.1),
+                        Colors.black.withOpacity(0.1),
                       ],
                     ),
                   ),
@@ -156,7 +156,7 @@ class _GununAnisiState extends State<GununAnisi> {
               icon: Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.2),
+                  color: Colors.white.withOpacity(0.2),
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(
@@ -188,14 +188,14 @@ class _GununAnisiState extends State<GununAnisi> {
                       borderRadius: BorderRadius.circular(25),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.orange.withValues(alpha: 0.15),
+                          color: Colors.orange.withOpacity(0.15),
                           blurRadius: 25,
                           spreadRadius: 0,
                           offset: const Offset(0, 10),
                         ),
                       ],
                       border: Border.all(
-                        color: Colors.orange.withValues(alpha: 0.1),
+                        color: Colors.orange.withOpacity(0.1),
                         width: 1.5,
                       ),
                     ),
@@ -216,7 +216,7 @@ class _GununAnisiState extends State<GununAnisi> {
                                 shape: BoxShape.circle,
                                 boxShadow: [
                                   BoxShadow(
-                                    color: Colors.orange.withValues(alpha: 0.3),
+                                    color: Colors.orange.withOpacity(0.3),
                                     blurRadius: 10,
                                     offset: const Offset(0, 4),
                                   ),
@@ -267,7 +267,7 @@ class _GununAnisiState extends State<GununAnisi> {
                       borderRadius: BorderRadius.circular(20),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.blueGrey.withValues(alpha: 0.08),
+                          color: Colors.blueGrey.withOpacity(0.08),
                           blurRadius: 15,
                           offset: const Offset(0, 5),
                         ),
@@ -279,7 +279,7 @@ class _GununAnisiState extends State<GununAnisi> {
                         decoration: BoxDecoration(
                           color: Colors.white,
                           border: Border.all(
-                            color: Colors.blueGrey.withValues(alpha: 0.08),
+                            color: Colors.blueGrey.withOpacity(0.08),
                             width: 1.5,
                           ),
                         ),
@@ -290,9 +290,7 @@ class _GununAnisiState extends State<GununAnisi> {
                               decoration: BoxDecoration(
                                 border: Border(
                                   bottom: BorderSide(
-                                    color: Colors.blueGrey.withValues(
-                                      alpha: 0.1,
-                                    ),
+                                    color: Colors.blueGrey.withOpacity(0.1,),
                                     width: 1,
                                   ),
                                 ),
@@ -321,10 +319,8 @@ class _GununAnisiState extends State<GununAnisi> {
                                     ),
                                     decoration: BoxDecoration(
                                       color: _charCount > 144
-                                          ? Colors.red.withValues(alpha: 0.1)
-                                          : Colors.orange.withValues(
-                                              alpha: 0.1,
-                                            ),
+                                          ? Colors.red.withOpacity(0.1)
+                                          : Colors.orange.withOpacity(0.1,),
                                       borderRadius: BorderRadius.circular(12),
                                     ),
                                     child: Text(
@@ -379,7 +375,7 @@ class _GununAnisiState extends State<GununAnisi> {
                         borderRadius: BorderRadius.circular(20),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.blue.withValues(alpha: 0.1),
+                            color: Colors.blue.withOpacity(0.1),
                             blurRadius: 15,
                             offset: const Offset(0, 5),
                           ),
@@ -392,7 +388,7 @@ class _GununAnisiState extends State<GununAnisi> {
                           decoration: BoxDecoration(
                             color: Colors.white,
                             border: Border.all(
-                              color: Colors.blueGrey.withValues(alpha: 0.08),
+                              color: Colors.blueGrey.withOpacity(0.08),
                               width: 1.5,
                             ),
                           ),
@@ -424,9 +420,7 @@ class _GununAnisiState extends State<GununAnisi> {
                                       decoration: BoxDecoration(
                                         borderRadius: BorderRadius.circular(16),
                                         border: Border.all(
-                                          color: Colors.orange.withValues(
-                                            alpha: 0.5,
-                                          ),
+                                          color: Colors.orange.withOpacity(0.5,),
                                           width: 2,
                                         ),
                                         image: DecorationImage(
@@ -452,9 +446,7 @@ class _GununAnisiState extends State<GununAnisi> {
                                                   4,
                                                 ),
                                                 decoration: BoxDecoration(
-                                                  color: Colors.red.withValues(
-                                                    alpha: 0.8,
-                                                  ),
+                                                  color: Colors.red.withOpacity(0.8,),
                                                   shape: BoxShape.circle,
                                                 ),
                                                 child: const Icon(
@@ -540,7 +532,7 @@ class _GununAnisiState extends State<GununAnisi> {
                         borderRadius: BorderRadius.circular(20),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.orange.withValues(alpha: 0.3),
+                            color: Colors.orange.withOpacity(0.3),
                             blurRadius: 20,
                             offset: const Offset(0, 8),
                           ),
@@ -574,10 +566,10 @@ class _GununAnisiState extends State<GununAnisi> {
                     margin: const EdgeInsets.only(top: 24, bottom: 20),
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
-                      color: Colors.blueGrey.withValues(alpha: 0.05),
+                      color: Colors.blueGrey.withOpacity(0.05),
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(
-                        color: Colors.blueGrey.withValues(alpha: 0.1),
+                        color: Colors.blueGrey.withOpacity(0.1),
                         width: 1,
                       ),
                     ),

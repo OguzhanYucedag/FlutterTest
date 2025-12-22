@@ -95,13 +95,13 @@ class _KurumProfilPageState extends State<KurumProfilPage> {
                     borderRadius: BorderRadius.circular(20),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.green.withValues(alpha: 0.1),
+                        color: Colors.green.withOpacity(0.1),
                         blurRadius: 20,
                         offset: const Offset(0, 8),
                       ),
                     ],
                     border: Border.all(
-                      color: Colors.green.withValues(alpha: 0.1),
+                      color: Colors.green.withOpacity(0.1),
                       width: 1,
                     ),
                   ),
@@ -118,12 +118,12 @@ class _KurumProfilPageState extends State<KurumProfilPage> {
                               decoration: BoxDecoration(
                                 color: const Color(
                                   0xFF4CAF50,
-                                ).withValues(alpha: 0.1),
+                                ).withOpacity(0.1),
                                 shape: BoxShape.circle,
                                 border: Border.all(
                                   color: const Color(
                                     0xFF4CAF50,
-                                  ).withValues(alpha: 0.3),
+                                  ).withOpacity(0.3),
                                   width: 2,
                                 ),
                               ),
@@ -228,7 +228,7 @@ class _KurumProfilPageState extends State<KurumProfilPage> {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: const Color(0xFF4CAF50).withValues(alpha: 0.5),
+          color: const Color(0xFF4CAF50).withOpacity(0.5),
         ),
       ),
       child: TextField(
@@ -250,7 +250,7 @@ class _KurumProfilPageState extends State<KurumProfilPage> {
           filled: true,
           fillColor: const Color(
             0xFF4CAF50,
-          ).withValues(alpha: 0.05), // Light green fill
+          ).withOpacity(0.05), // Light green fill
         ),
       ),
     );
@@ -271,7 +271,7 @@ class _KurumProfilPageState extends State<KurumProfilPage> {
             borderRadius: BorderRadius.circular(12),
           ),
           elevation: 2,
-          shadowColor: Colors.green.withValues(alpha: 0.3),
+          shadowColor: Colors.green.withOpacity(0.3),
         ),
         child: const Row(
           mainAxisAlignment: MainAxisAlignment.center,

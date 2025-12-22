@@ -85,7 +85,7 @@ class _OgrencilerimPageState extends State<OgrencilerimPage> {
             expandedHeight: 180,
             pinned: true,
             elevation: 10,
-            shadowColor: Colors.deepPurple.withValues(alpha: 0.3),
+            shadowColor: Colors.deepPurple.withOpacity(0.3),
             shape: const ContinuousRectangleBorder(
               borderRadius: BorderRadius.only(
                 bottomLeft: Radius.circular(40),
@@ -154,7 +154,7 @@ class _OgrencilerimPageState extends State<OgrencilerimPage> {
                       end: Alignment.bottomCenter,
                       colors: [
                         Colors.transparent,
-                        Colors.black.withValues(alpha: 0.1),
+                        Colors.black.withOpacity(0.1),
                       ],
                     ),
                   ),
@@ -165,7 +165,7 @@ class _OgrencilerimPageState extends State<OgrencilerimPage> {
               icon: Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.2),
+                  color: Colors.white.withOpacity(0.2),
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(
@@ -199,13 +199,13 @@ class _OgrencilerimPageState extends State<OgrencilerimPage> {
                       borderRadius: BorderRadius.circular(25),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.purple.withValues(alpha: 0.15),
+                          color: Colors.purple.withOpacity(0.15),
                           blurRadius: 25,
                           offset: const Offset(0, 10),
                         ),
                       ],
                       border: Border.all(
-                        color: Colors.purple.withValues(alpha: 0.1),
+                        color: Colors.purple.withOpacity(0.1),
                         width: 1.5,
                       ),
                     ),
@@ -223,7 +223,7 @@ class _OgrencilerimPageState extends State<OgrencilerimPage> {
                             shape: BoxShape.circle,
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.purple.withValues(alpha: 0.3),
+                                color: Colors.purple.withOpacity(0.3),
                                 blurRadius: 10,
                                 offset: const Offset(0, 4),
                               ),
@@ -264,13 +264,13 @@ class _OgrencilerimPageState extends State<OgrencilerimPage> {
                       borderRadius: BorderRadius.circular(20),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.blueGrey.withValues(alpha: 0.08),
+                          color: Colors.blueGrey.withOpacity(0.08),
                           blurRadius: 15,
                           offset: const Offset(0, 5),
                         ),
                       ],
                       border: Border.all(
-                        color: Colors.blueGrey.withValues(alpha: 0.1),
+                        color: Colors.blueGrey.withOpacity(0.1),
                         width: 1.5,
                       ),
                     ),
@@ -282,10 +282,10 @@ class _OgrencilerimPageState extends State<OgrencilerimPage> {
                             Container(
                               padding: const EdgeInsets.all(12),
                               decoration: BoxDecoration(
-                                color: Colors.purple.withValues(alpha: 0.1),
+                                color: Colors.purple.withOpacity(0.1),
                                 shape: BoxShape.circle,
                                 border: Border.all(
-                                  color: Colors.purple.withValues(alpha: 0.2),
+                                  color: Colors.purple.withOpacity(0.2),
                                   width: 2,
                                 ),
                               ),
@@ -354,7 +354,7 @@ class _OgrencilerimPageState extends State<OgrencilerimPage> {
         borderRadius: BorderRadius.circular(22),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.08),
+            color: Colors.black.withOpacity(0.08),
             blurRadius: 15,
             offset: const Offset(0, 5),
           ),
@@ -373,7 +373,7 @@ class _OgrencilerimPageState extends State<OgrencilerimPage> {
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 border: Border.all(
-                  color: Colors.blueGrey.withValues(alpha: 0.08),
+                  color: Colors.blueGrey.withOpacity(0.08),
                   width: 1.5,
                 ),
               ),
@@ -386,8 +386,8 @@ class _OgrencilerimPageState extends State<OgrencilerimPage> {
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         colors: [
-                          color.withValues(alpha: 0.9),
-                          color.withValues(alpha: 0.7),
+                          color.withOpacity(0.9),
+                          color.withOpacity(0.7),
                         ],
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
@@ -395,7 +395,7 @@ class _OgrencilerimPageState extends State<OgrencilerimPage> {
                       shape: BoxShape.circle,
                       boxShadow: [
                         BoxShadow(
-                          color: color.withValues(alpha: 0.3),
+                          color: color.withOpacity(0.3),
                           blurRadius: 10,
                           offset: const Offset(0, 4),
                         ),
@@ -488,7 +488,7 @@ class _OgrencilerimPageState extends State<OgrencilerimPage> {
                                 vertical: 4,
                               ),
                               decoration: BoxDecoration(
-                                color: Colors.blueGrey.withValues(alpha: 0.05),
+                                color: Colors.blueGrey.withOpacity(0.05),
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               child: Text(
@@ -511,7 +511,7 @@ class _OgrencilerimPageState extends State<OgrencilerimPage> {
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: color.withValues(alpha: 0.1),
+                      color: color.withOpacity(0.1),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
