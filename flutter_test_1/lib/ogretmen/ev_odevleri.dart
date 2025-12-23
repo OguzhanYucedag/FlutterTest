@@ -1,9 +1,11 @@
 import 'dart:io';
-
+import 'dart:math';
+import 'package:image_picker_for_web/image_picker_for_web.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 
 class EvOdevleriPage extends StatefulWidget {
   const EvOdevleriPage({super.key});
@@ -21,14 +23,13 @@ class _EvOdevleriPageState extends State<EvOdevleriPage> {
   DateTime? secilmisTarih;
   PlatformFile? secilenDosya;
 
-  final List<String> dersbranslari = [ 
+  final List<String> dersbranslari = [
     'Akademik Alanlar',
     'Dil ve İletişim Gelişimi',
     'Sosyal ve Duygusal Gelişim',
     'Öz Bakım ve Günlük Yaşam Becerileri',
     'Psikomotor Gelişim',
     'Sanat ve Estetik',
-    'Destekleyici Eğitim Etkinlikleri',
     'Destekleyici Eğitim Etkinlikleri',
     'Beden Eğitimi ve Oyun',
   ];
@@ -78,11 +79,39 @@ class _EvOdevleriPageState extends State<EvOdevleriPage> {
   }
 
   Future<void> secilecekDosya() async {
-    final result = await FilePicker.platform.pickFiles();
-    if (result != null) {
-      setState(() {
-        secilenDosya = result.files.first;
-      });
+    FilePickerResult? result;
+    
+    try {
+      if (kIsWeb) {
+        // Web için withData: true kullan
+        result = await FilePicker.platform.pickFiles(
+          withData: true,
+          allowMultiple: false,
+          type: FileType.custom,
+          allowedExtensions: ['pdf', 'jpg', 'jpeg', 'png', 'doc', 'docx', 'ppt', 'pptx', 'txt'],
+        );
+      } else {
+        // Mobil için normal pick
+        result = await FilePicker.platform.pickFiles(
+          allowMultiple: false,
+          type: FileType.custom,
+          allowedExtensions: ['pdf', 'jpg', 'jpeg', 'png', 'doc', 'docx', 'ppt', 'pptx', 'txt'],
+        );
+      }
+      
+      if (result != null && result.files.isNotEmpty) {
+        setState(() {
+          secilenDosya = result!.files.first;
+        });
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Dosya seçilirken hata: $e'),
+          backgroundColor: Colors.red[400],
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
     }
   }
 
@@ -117,11 +146,14 @@ class _EvOdevleriPageState extends State<EvOdevleriPage> {
 
       String? downloadUrl;
       String? contentType;
-      if (secilenDosya != null && secilenDosya!.path != null) {
+      String? fileName;
+      
+      if (secilenDosya != null) {
         try {
           final uploadResult = await _uploadFile(secilenDosya!);
           downloadUrl = uploadResult.$1;
           contentType = uploadResult.$2;
+          fileName = secilenDosya!.name;
         } catch (e) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -141,7 +173,7 @@ class _EvOdevleriPageState extends State<EvOdevleriPage> {
           'ders': subject,
           'ogrenci': student ?? 'Tüm Sınıf',
           'teslimTarihi': Timestamp.fromDate(dueDate),
-          'dosyaAdi': secilenDosya?.name ?? '',
+          'dosyaAdi': fileName ?? '',
           'dosyaUrl': downloadUrl ?? '',
           'dosyaTur': contentType ?? '',
           'olusturmaZamani': FieldValue.serverTimestamp(),
@@ -149,8 +181,8 @@ class _EvOdevleriPageState extends State<EvOdevleriPage> {
 
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Row(
-              children: const [
+            content: const Row(
+              children: [
                 Icon(Icons.check_circle, color: Colors.white),
                 SizedBox(width: 12),
                 Text('Ödev başarıyla velilere gönderildi!'),
@@ -180,6 +212,7 @@ class _EvOdevleriPageState extends State<EvOdevleriPage> {
       odevDetaylari.clear();
       setState(() {
         _selectedSubject = null;
+        secilenOgrenci = null;
         secilmisTarih = null;
         secilenDosya = null;
       });
@@ -187,18 +220,51 @@ class _EvOdevleriPageState extends State<EvOdevleriPage> {
   }
 
   Future<(String, String)> _uploadFile(PlatformFile file) async {
-    final filePath = file.path;
-    if (filePath == null) throw 'Dosya yolu alınamadı';
+    // 1️⃣ Dosya adı
+    final String fileName = file.name;
 
-    final fileName = file.name;
-    final contentType = _inferContentType(fileName);
-    final ref = FirebaseStorage.instance.ref('odevler/$fileName');
+    // 2️⃣ Dosya türünü belirle
+    final String contentType = _inferContentType(fileName);
 
-    await ref.putFile(File(filePath), SettableMetadata(contentType: contentType));
-    final url = await ref.getDownloadURL();
-    return (url, contentType);
+    // 3️⃣ Benzersiz dosya adı oluştur
+    final String uniqueFileName = '${DateTime.now().millisecondsSinceEpoch}_${fileName.replaceAll(RegExp(r'[^a-zA-Z0-9._-]'), '_')}';
+    final Reference ref = FirebaseStorage.instance.ref('odevler/$uniqueFileName');
+
+    UploadTask uploadTask;
+
+    // 4️⃣ PLATFORM KONTROLÜ - Web ve Mobil ayrımı
+    if (kIsWeb) {
+      // 🌐 FLUTTER WEB: bytes kullan
+      if (file.bytes == null) {
+        throw Exception('Web için dosya byte verisi alınamadı');
+      }
+      
+      uploadTask = ref.putData(
+        file.bytes!,
+        SettableMetadata(contentType: contentType),
+      );
+    } else {
+      // 📱 ANDROID / IOS: path kullan
+      if (file.path == null) {
+        throw Exception('Mobil için dosya yolu alınamadı');
+      }
+      
+      // dart:io File sadece mobilde kullanılır
+      final ioFile = File(file.path!);
+      uploadTask = ref.putFile(
+        ioFile,
+        SettableMetadata(contentType: contentType),
+      );
+    }
+
+    // 5️⃣ Yükleme tamamlanana kadar bekle
+    final TaskSnapshot snapshot = await uploadTask;
+
+    // 6️⃣ Download URL'sini al
+    final String downloadUrl = await snapshot.ref.getDownloadURL();
+    return (downloadUrl, contentType);
   }
-  //yazay zekadan destek alındı
+
   String _inferContentType(String fileName) {
     final ext = fileName.split('.').last.toLowerCase();
     switch (ext) {
@@ -209,6 +275,8 @@ class _EvOdevleriPageState extends State<EvOdevleriPage> {
       case 'jpg':
       case 'jpeg':
         return 'image/jpeg';
+      case 'gif':
+        return 'image/gif';
       case 'doc':
         return 'application/msword';
       case 'docx':
@@ -217,11 +285,28 @@ class _EvOdevleriPageState extends State<EvOdevleriPage> {
         return 'application/vnd.ms-powerpoint';
       case 'pptx':
         return 'application/vnd.openxmlformats-officedocument.presentationml.presentation';
+      case 'xls':
+        return 'application/vnd.ms-excel';
+      case 'xlsx':
+        return 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+      case 'txt':
+        return 'text/plain';
+      case 'mp3':
+        return 'audio/mpeg';
+      case 'mp4':
+        return 'video/mp4';
       default:
         return 'application/octet-stream';
     }
   }
-  //yazay zekadan destek alındı
+
+  String _formatFileSize(int bytes) {
+    if (bytes <= 0) return "0 B";
+    const suffixes = ["B", "KB", "MB", "GB"];
+    final i = (log(bytes) / log(1024)).floor();
+    return '${(bytes / pow(1024, i)).toStringAsFixed(1)} ${suffixes[i]}';
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -239,8 +324,8 @@ class _EvOdevleriPageState extends State<EvOdevleriPage> {
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   colors: [
-                    Color(0xFFFFB74D), // Orange 300
-                    Color(0xFFFF9800), // Orange 500
+                    Color(0xFFFFB74D),
+                    Color(0xFFFF9800),
                   ],
                 ),
                 borderRadius: BorderRadius.only(
@@ -265,12 +350,12 @@ class _EvOdevleriPageState extends State<EvOdevleriPage> {
               icon: Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.2),
+                  color: Colors.white.withOpacity(0.2),
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(Icons.arrow_back_ios_new, size: 18),
               ),
-              onPressed: () => Navigator.pop(context),//ok ikonu 
+              onPressed: () => Navigator.pop(context),
             ),
           ),
           SliverToBoxAdapter(
@@ -284,7 +369,7 @@ class _EvOdevleriPageState extends State<EvOdevleriPage> {
                     // Subject Selection Card
                     _buildCard(
                       child: DropdownButtonFormField<String>(
-                        initialValue: _selectedSubject,
+                        value: _selectedSubject,
                         isExpanded: true,
                         decoration: InputDecoration(
                           labelText: 'Gelişim Alanı / Ders Seçiniz',
@@ -313,6 +398,12 @@ class _EvOdevleriPageState extends State<EvOdevleriPage> {
                             _selectedSubject = newValue;
                           });
                         },
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Lütfen bir ders seçiniz';
+                          }
+                          return null;
+                        },
                       ),
                     ),
                     const SizedBox(height: 16),
@@ -320,7 +411,7 @@ class _EvOdevleriPageState extends State<EvOdevleriPage> {
                     // Student Selection Card
                     _buildCard(
                       child: DropdownButtonFormField<String>(
-                        initialValue: secilenOgrenci,//*****************ÖĞRENCİ CHACKBOX KISMI ********************
+                        value: secilenOgrenci,
                         isExpanded: true,
                         decoration: InputDecoration(
                           labelText: 'Öğrenci Seçiniz (Tüm Sınıf)',
@@ -334,23 +425,22 @@ class _EvOdevleriPageState extends State<EvOdevleriPage> {
                             vertical: 12,
                           ),
                         ),
-                        items:
-                            [
-                              const DropdownMenuItem<String>(
-                                value: null,
-                                child: Text('Tüm Sınıf'),
+                        items: [
+                          const DropdownMenuItem<String>(
+                            value: null,
+                            child: Text('Tüm Sınıf'),
+                          ),
+                          ...ogrencilerList.map((String student) {
+                            return DropdownMenuItem<String>(
+                              value: student,
+                              child: Text(
+                                student,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(fontSize: 14),
                               ),
-                            ] +
-                            ogrencilerList.map((String student) {
-                              return DropdownMenuItem<String>(
-                                value: student,
-                                child: Text(
-                                  student,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(fontSize: 14),
-                                ),
-                              );
-                            }).toList(),
+                            );
+                          }),
+                        ],
                         onChanged: (newValue) {
                           setState(() {
                             secilenOgrenci = newValue;
@@ -363,10 +453,10 @@ class _EvOdevleriPageState extends State<EvOdevleriPage> {
                     // Title Input
                     _buildCard(
                       child: TextFormField(
-                        controller: odevBaslik,/********************ÖDEV BAŞLIK KISMI*******************/
+                        controller: odevBaslik,
                         decoration: InputDecoration(
                           labelText: 'Ödev Başlığı',
-                          hintText: 'Örn: İnce motor bec çalışması',
+                          hintText: 'Örn: İnce motor becerileri çalışması',
                           prefixIcon: Icon(
                             Icons.title,
                             color: Colors.orange[700],
@@ -444,10 +534,10 @@ class _EvOdevleriPageState extends State<EvOdevleriPage> {
                                   vertical: 8,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: Colors.orange.withValues(alpha: 0.1),
+                                  color: Colors.orange.withOpacity(0.1),
                                   borderRadius: BorderRadius.circular(8),
                                   border: Border.all(
-                                    color: Colors.orange.withValues(alpha: 0.3),
+                                    color: Colors.orange.withOpacity(0.3),
                                   ),
                                 ),
                                 child: Row(
@@ -502,6 +592,17 @@ class _EvOdevleriPageState extends State<EvOdevleriPage> {
                                   ),
                                 ),
                               ),
+                            if (secilenDosya != null)
+                              Padding(
+                                padding: const EdgeInsets.only(top: 8.0),
+                                child: Text(
+                                  'Boyut: ${_formatFileSize(secilenDosya!.size)}',
+                                  style: TextStyle(
+                                    color: Colors.grey[600],
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ),
                           ],
                         ),
                       ),
@@ -551,7 +652,7 @@ class _EvOdevleriPageState extends State<EvOdevleriPage> {
                               Icon(
                                 Icons.arrow_forward_ios,
                                 size: 16,
-                                color: Colors.grey[300],
+                                color: Colors.grey[400],
                               ),
                             ],
                           ),
@@ -582,7 +683,7 @@ class _EvOdevleriPageState extends State<EvOdevleriPage> {
                             borderRadius: BorderRadius.circular(14),
                           ),
                           elevation: 4,
-                          shadowColor: Colors.orange.withValues(alpha: 0.3),
+                          shadowColor: Colors.orange.withOpacity(0.3),
                         ),
                       ),
                     ),
@@ -603,12 +704,12 @@ class _EvOdevleriPageState extends State<EvOdevleriPage> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withValues(alpha: 0.08),
+            color: Colors.grey.withOpacity(0.08),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
         ],
-        border: Border.all(color: Colors.grey.withValues(alpha: 0.1)),
+        border: Border.all(color: Colors.grey.withOpacity(0.1)),
       ),
       child: child,
     );
