@@ -14,14 +14,14 @@ class EvOdevleriPage extends StatefulWidget {
 
 class _EvOdevleriPageState extends State<EvOdevleriPage> {
   final _formKey = GlobalKey<FormState>();
-  final TextEditingController _titleController = TextEditingController();
-  final TextEditingController _descriptionController = TextEditingController();
+  final TextEditingController odevBaslik = TextEditingController();
+  final TextEditingController odevDetaylari = TextEditingController();
   String? _selectedSubject;
-  String? _selectedStudent;
-  DateTime? _selectedDate;
-  PlatformFile? _selectedFile;
+  String? secilenOgrenci;
+  DateTime? secilmisTarih;
+  PlatformFile? secilenDosya;
 
-  final List<String> _subjects = [
+  final List<String> dersbranslari = [ 
     'Akademik Alanlar',
     'Dil ve İletişim Gelişimi',
     'Sosyal ve Duygusal Gelişim',
@@ -33,7 +33,7 @@ class _EvOdevleriPageState extends State<EvOdevleriPage> {
     'Beden Eğitimi ve Oyun',
   ];
 
-  final List<String> _students = [
+  final List<String> ogrencilerList = [
     'Ahmet Yılmaz',
     'Ayşe Kaya',
     'Mehmet Demir',
@@ -43,12 +43,12 @@ class _EvOdevleriPageState extends State<EvOdevleriPage> {
 
   @override
   void dispose() {
-    _titleController.dispose();
-    _descriptionController.dispose();
+    odevBaslik.dispose();
+    odevDetaylari.dispose();
     super.dispose();
   }
 
-  Future<void> _selectDate(BuildContext context) async {
+  Future<void> secilecekTarih(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
       context: context,
       initialDate: DateTime.now().add(const Duration(days: 1)),
@@ -70,18 +70,18 @@ class _EvOdevleriPageState extends State<EvOdevleriPage> {
         );
       },
     );
-    if (picked != null && picked != _selectedDate) {
+    if (picked != null && picked != secilmisTarih) {
       setState(() {
-        _selectedDate = picked;
+        secilmisTarih = picked;
       });
     }
   }
 
-  Future<void> _pickFile() async {
+  Future<void> secilecekDosya() async {
     final result = await FilePicker.platform.pickFiles();
     if (result != null) {
       setState(() {
-        _selectedFile = result.files.first;
+        secilenDosya = result.files.first;
       });
     }
   }
@@ -98,7 +98,7 @@ class _EvOdevleriPageState extends State<EvOdevleriPage> {
         );
         return;
       }
-      if (_selectedDate == null) {
+      if (secilmisTarih == null) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: const Text('Lütfen teslim tarihi seçiniz'),
@@ -109,17 +109,17 @@ class _EvOdevleriPageState extends State<EvOdevleriPage> {
         return;
       }
 
-      final title = _titleController.text.trim();
-      final description = _descriptionController.text.trim();
+      final title = odevBaslik.text.trim();
+      final description = odevDetaylari.text.trim();
       final subject = _selectedSubject;
-      final student = _selectedStudent;
-      final dueDate = _selectedDate!;
+      final student = secilenOgrenci;
+      final dueDate = secilmisTarih!;
 
       String? downloadUrl;
       String? contentType;
-      if (_selectedFile != null && _selectedFile!.path != null) {
+      if (secilenDosya != null && secilenDosya!.path != null) {
         try {
-          final uploadResult = await _uploadFile(_selectedFile!);
+          final uploadResult = await _uploadFile(secilenDosya!);
           downloadUrl = uploadResult.$1;
           contentType = uploadResult.$2;
         } catch (e) {
@@ -141,7 +141,7 @@ class _EvOdevleriPageState extends State<EvOdevleriPage> {
           'ders': subject,
           'ogrenci': student ?? 'Tüm Sınıf',
           'teslimTarihi': Timestamp.fromDate(dueDate),
-          'dosyaAdi': _selectedFile?.name ?? '',
+          'dosyaAdi': secilenDosya?.name ?? '',
           'dosyaUrl': downloadUrl ?? '',
           'dosyaTur': contentType ?? '',
           'olusturmaZamani': FieldValue.serverTimestamp(),
@@ -176,12 +176,12 @@ class _EvOdevleriPageState extends State<EvOdevleriPage> {
 
       // Reset form
       _formKey.currentState!.reset();
-      _titleController.clear();
-      _descriptionController.clear();
+      odevBaslik.clear();
+      odevDetaylari.clear();
       setState(() {
         _selectedSubject = null;
-        _selectedDate = null;
-        _selectedFile = null;
+        secilmisTarih = null;
+        secilenDosya = null;
       });
     }
   }
@@ -198,7 +198,7 @@ class _EvOdevleriPageState extends State<EvOdevleriPage> {
     final url = await ref.getDownloadURL();
     return (url, contentType);
   }
-
+  //yazay zekadan destek alındı
   String _inferContentType(String fileName) {
     final ext = fileName.split('.').last.toLowerCase();
     switch (ext) {
@@ -221,7 +221,7 @@ class _EvOdevleriPageState extends State<EvOdevleriPage> {
         return 'application/octet-stream';
     }
   }
-
+  //yazay zekadan destek alındı
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -270,7 +270,7 @@ class _EvOdevleriPageState extends State<EvOdevleriPage> {
                 ),
                 child: const Icon(Icons.arrow_back_ios_new, size: 18),
               ),
-              onPressed: () => Navigator.pop(context),
+              onPressed: () => Navigator.pop(context),//ok ikonu 
             ),
           ),
           SliverToBoxAdapter(
@@ -298,7 +298,7 @@ class _EvOdevleriPageState extends State<EvOdevleriPage> {
                             vertical: 12,
                           ),
                         ),
-                        items: _subjects.map((String subject) {
+                        items: dersbranslari.map((String subject) {
                           return DropdownMenuItem<String>(
                             value: subject,
                             child: Text(
@@ -320,7 +320,7 @@ class _EvOdevleriPageState extends State<EvOdevleriPage> {
                     // Student Selection Card
                     _buildCard(
                       child: DropdownButtonFormField<String>(
-                        initialValue: _selectedStudent,
+                        initialValue: secilenOgrenci,//*****************ÖĞRENCİ CHACKBOX KISMI ********************
                         isExpanded: true,
                         decoration: InputDecoration(
                           labelText: 'Öğrenci Seçiniz (Tüm Sınıf)',
@@ -341,7 +341,7 @@ class _EvOdevleriPageState extends State<EvOdevleriPage> {
                                 child: Text('Tüm Sınıf'),
                               ),
                             ] +
-                            _students.map((String student) {
+                            ogrencilerList.map((String student) {
                               return DropdownMenuItem<String>(
                                 value: student,
                                 child: Text(
@@ -353,7 +353,7 @@ class _EvOdevleriPageState extends State<EvOdevleriPage> {
                             }).toList(),
                         onChanged: (newValue) {
                           setState(() {
-                            _selectedStudent = newValue;
+                            secilenOgrenci = newValue;
                           });
                         },
                       ),
@@ -363,7 +363,7 @@ class _EvOdevleriPageState extends State<EvOdevleriPage> {
                     // Title Input
                     _buildCard(
                       child: TextFormField(
-                        controller: _titleController,
+                        controller: odevBaslik,/********************ÖDEV BAŞLIK KISMI*******************/
                         decoration: InputDecoration(
                           labelText: 'Ödev Başlığı',
                           hintText: 'Örn: İnce motor bec çalışması',
@@ -387,7 +387,7 @@ class _EvOdevleriPageState extends State<EvOdevleriPage> {
                     // Description Input
                     _buildCard(
                       child: TextFormField(
-                        controller: _descriptionController,
+                        controller: odevDetaylari,
                         maxLines: 4,
                         decoration: InputDecoration(
                           labelText: 'Açıklama',
@@ -437,7 +437,7 @@ class _EvOdevleriPageState extends State<EvOdevleriPage> {
                               ],
                             ),
                             const SizedBox(height: 12),
-                            if (_selectedFile != null)
+                            if (secilenDosya != null)
                               Container(
                                 padding: const EdgeInsets.symmetric(
                                   horizontal: 12,
@@ -460,7 +460,7 @@ class _EvOdevleriPageState extends State<EvOdevleriPage> {
                                     const SizedBox(width: 8),
                                     Expanded(
                                       child: Text(
-                                        _selectedFile!.name,
+                                        secilenDosya!.name,
                                         style: TextStyle(
                                           color: Colors.orange[900],
                                           fontWeight: FontWeight.w500,
@@ -476,7 +476,7 @@ class _EvOdevleriPageState extends State<EvOdevleriPage> {
                                       ),
                                       onPressed: () {
                                         setState(() {
-                                          _selectedFile = null;
+                                          secilenDosya = null;
                                         });
                                       },
                                     ),
@@ -487,7 +487,7 @@ class _EvOdevleriPageState extends State<EvOdevleriPage> {
                               SizedBox(
                                 width: double.infinity,
                                 child: OutlinedButton.icon(
-                                  onPressed: _pickFile,
+                                  onPressed: secilecekDosya,
                                   icon: const Icon(Icons.upload_file),
                                   label: const Text('Dosya Seç'),
                                   style: OutlinedButton.styleFrom(
@@ -511,7 +511,7 @@ class _EvOdevleriPageState extends State<EvOdevleriPage> {
 
                     // Date Picker
                     GestureDetector(
-                      onTap: () => _selectDate(context),
+                      onTap: () => secilecekTarih(context),
                       child: _buildCard(
                         child: Padding(
                           padding: const EdgeInsets.all(16.0),
@@ -534,11 +534,11 @@ class _EvOdevleriPageState extends State<EvOdevleriPage> {
                                   ),
                                   const SizedBox(height: 4),
                                   Text(
-                                    _selectedDate == null
+                                    secilmisTarih == null
                                         ? 'Tarih Seçiniz'
-                                        : '${_selectedDate!.day}.${_selectedDate!.month}.${_selectedDate!.year}',
+                                        : '${secilmisTarih!.day}.${secilmisTarih!.month}.${secilmisTarih!.year}',
                                     style: TextStyle(
-                                      color: _selectedDate == null
+                                      color: secilmisTarih == null
                                           ? Colors.grey[400]
                                           : Colors.blueGrey[800],
                                       fontSize: 16,
