@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:intl/intl.dart';
 
 class OdevlerimVeli extends StatefulWidget {
   final String? ogrenciAdi;
   final String? sinif;
-  
+
   const OdevlerimVeli({super.key, this.ogrenciAdi, this.sinif});
 
   @override
@@ -14,55 +17,31 @@ class _OdevlerimVeliState extends State<OdevlerimVeli>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   String? _selectedDers;
-  
+
   final List<Map<String, dynamic>> _akademikAlanlar = [
     {
       'id': 1,
-      'ad': 'Akademik Alanlar',
-      'icon': Icons.school_outlined,
-      'renk': Colors.blue,
-    },
-    {
-      'id': 2,
-      'ad': 'Dil ve İletişim Gelişimi',
-      'icon': Icons.language_outlined,
-      'renk': Colors.green,
-    },
-    {
-      'id': 3,
-      'ad': 'Sosyal ve Duygusal Gelişim',
-      'icon': Icons.people_outline,
-      'renk': Colors.orange,
-    },
-    {
-      'id': 4,
-      'ad': 'Öz Bakım ve Günlük Yaşam Becerileri',
-      'icon': Icons.self_improvement_outlined,
-      'renk': Colors.purple,
-    },
-    {
-      'id': 5,
-      'ad': 'Psikomotor Gelişim',
-      'icon': Icons.directions_run_outlined,
-      'renk': Colors.red,
-    },
-    {
-      'id': 6,
-      'ad': 'Sanat ve Estetik',
-      'icon': Icons.brush_outlined,
-      'renk': Colors.pink,
-    },
-    {
-      'id': 7,
       'ad': 'Destekleyici Eğitim Etkinlikleri',
       'icon': Icons.assistant_outlined,
       'renk': Colors.teal,
     },
     {
-      'id': 8,
-      'ad': 'Beden Eğitimi ve Oyun',
-      'icon': Icons.sports_soccer_outlined,
-      'renk': Colors.brown,
+      'id': 2,
+      'ad': 'Dil ve Konuşma Becerileri',
+      'icon': Icons.record_voice_over,
+      'renk': Colors.purple,
+    },
+    {
+      'id': 3,
+      'ad': 'Okuma ve Yazma Becerileri',
+      'icon': Icons.edit,
+      'renk': Colors.orange,
+    },
+    {
+      'id': 4,
+      'ad': 'Psikomotor Gelişim',
+      'icon': Icons.directions_run,
+      'renk': Colors.blue,
     },
   ];
 
@@ -70,13 +49,23 @@ class _OdevlerimVeliState extends State<OdevlerimVeli>
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
-    _selectedDers = _akademikAlanlar[0]['ad'];
   }
 
   @override
   void dispose() {
     _tabController.dispose();
     super.dispose();
+  }
+
+  Future<void> _launchURL(String urlString) async {
+    final Uri url = Uri.parse(urlString);
+    if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Dosya açılamadı: $urlString')));
+      }
+    }
   }
 
   @override
@@ -98,10 +87,7 @@ class _OdevlerimVeliState extends State<OdevlerimVeli>
             if (widget.ogrenciAdi != null)
               Text(
                 widget.ogrenciAdi!,
-                style: const TextStyle(
-                  color: Colors.white70,
-                  fontSize: 12,
-                ),
+                style: const TextStyle(color: Colors.white70, fontSize: 12),
               ),
           ],
         ),
@@ -130,7 +116,7 @@ class _OdevlerimVeliState extends State<OdevlerimVeli>
         children: [
           // Ders Filtreleme Alanı
           _buildDersFiltreleme(),
-          
+
           // TabBarView Alanı
           Expanded(
             child: TabBarView(
@@ -138,8 +124,11 @@ class _OdevlerimVeliState extends State<OdevlerimVeli>
               children: [
                 // Bekleyen Ödevler Tab
                 _buildOdevList(isTamamlandi: false),
-                // Tamamlanan Ödevler Tab
-                _buildOdevList(isTamamlandi: true),
+                // Tamamlanan Ödevler Tab - Şu an için boş veya aynı mantıkla filtrelenmiş olabilir
+                // İsterseniz burayı da 'tamamlananOdevler' koleksiyonundan çekebilirsiniz.
+                // Şimdilik sadece mesaj gösterelim veya bekleyenler mantığıyla ama tamamlandı flag'i ile (eğer olsa)
+                // Ancak veritabanı yapısında 'bekleyenOdevler' ayrı bir koleksiyon gibi duruyor.
+                _buildTamamlananList(),
               ],
             ),
           ),
@@ -172,7 +161,7 @@ class _OdevlerimVeliState extends State<OdevlerimVeli>
               itemBuilder: (context, index) {
                 final alan = _akademikAlanlar[index];
                 final isSelected = _selectedDers == alan['ad'];
-                
+
                 return Padding(
                   padding: const EdgeInsets.only(right: 8),
                   child: FilterChip(
@@ -196,9 +185,7 @@ class _OdevlerimVeliState extends State<OdevlerimVeli>
                     ),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
-                      side: BorderSide(
-                        color: alan['renk'].withOpacity(0.3),
-                      ),
+                      side: BorderSide(color: alan['renk'].withOpacity(0.3)),
                     ),
                     elevation: isSelected ? 2 : 0,
                     shadowColor: alan['renk'].withOpacity(0.2),
@@ -212,130 +199,132 @@ class _OdevlerimVeliState extends State<OdevlerimVeli>
     );
   }
 
+  // Bekleyen ödevler için StreamBuilder
   Widget _buildOdevList({required bool isTamamlandi}) {
-    // Filtrelenmiş ödev verileri
-    final List<Map<String, dynamic>> odevler = _getFilteredOdevler(isTamamlandi);
+    // Sadece bekleyenler için çalışacak şekilde ayarladık,
+    // "isTamamlandi" parametresi şu an kullanılmıyor çünkü koleksiyon farklı olabilir.
+    // Ancak user "bekleyenOdevler" koleksiyonunu belirtti.
 
-    if (odevler.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.assignment_turned_in_outlined,
-              size: 64,
-              color: Colors.grey[300],
-            ),
-            const SizedBox(height: 16),
-            Text(
-              isTamamlandi
-                  ? "Henüz tamamlanan ödev yok"
-                  : "Bekleyen ödev bulunmamaktadır",
-              style: TextStyle(color: Colors.grey[600], fontSize: 16),
-            ),
-            if (_selectedDers != null) ...[
-              const SizedBox(height: 8),
-              Text(
-                "Filtre: $_selectedDers",
-                style: TextStyle(color: Colors.grey[500], fontSize: 14),
-              ),
-            ]
-          ],
-        ),
-      );
+    if (widget.ogrenciAdi == null) {
+      return const Center(child: Text("Öğrenci bilgisi bulunamadı."));
     }
 
-    return ListView.builder(
-      padding: const EdgeInsets.all(16),
-      itemCount: odevler.length,
-      itemBuilder: (context, index) {
-        final odev = odevler[index];
-        return _buildOdevCard(odev, isTamamlandi);
+    Query query = FirebaseFirestore.instance
+        .collection('bekleyenOdevler')
+        .where(
+          Filter.or(
+            Filter('ogrenci', isEqualTo: widget.ogrenciAdi),
+            Filter('ogrenci', isEqualTo: 'Tüm Sınıf'),
+          ),
+        );
+
+    if (_selectedDers != null) {
+      query = query.where('ders', isEqualTo: _selectedDers);
+    }
+
+    return StreamBuilder<QuerySnapshot>(
+      stream: query.snapshots(),
+      builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          return Center(child: Text('Bir hata oluştu: ${snapshot.error}'));
+        }
+
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.assignment_turned_in_outlined,
+                  size: 64,
+                  color: Colors.grey[300],
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  "Bekleyen ödev bulunmamaktadır",
+                  style: TextStyle(color: Colors.grey[600], fontSize: 16),
+                ),
+                if (_selectedDers != null) ...[
+                  const SizedBox(height: 8),
+                  Text(
+                    "Filtre: $_selectedDers",
+                    style: TextStyle(color: Colors.grey[500], fontSize: 14),
+                  ),
+                ],
+              ],
+            ),
+          );
+        }
+
+        final docs = snapshot.data!.docs;
+
+        return ListView.builder(
+          padding: const EdgeInsets.all(16),
+          itemCount: docs.length,
+          itemBuilder: (context, index) {
+            final doc = docs[index];
+            final data = doc.data() as Map<String, dynamic>;
+            // Firestore document ID'sini de gönderelim
+            return _buildOdevCard(data, doc.id, false);
+          },
+        );
       },
     );
   }
 
-  List<Map<String, dynamic>> _getFilteredOdevler(bool isTamamlandi) {
-    // Örnek ödev verileri - Gerçek uygulamada API'den gelecek
-    final allOdevler = isTamamlandi
-        ? [
-            {
-              'ders': 'Akademik Alanlar',
-              'baslik': 'Rakamları Tanıma',
-              'tarih': '18.12.2023',
-              'not': 'Pekiyi',
-              'aciklama': '1-10 arası rakamları tanıma ve yazma çalışması',
-            },
-            {
-              'ders': 'Dil ve İletişim Gelişimi',
-              'baslik': 'Sesli Okuma Çalışması',
-              'tarih': '17.12.2023',
-              'not': 'İyi',
-              'aciklama': 'Basit cümleleri sesli okuma ve anlatma',
-            },
-            {
-              'ders': 'Sosyal ve Duygusal Gelişim',
-              'baslik': 'Duygu Kartları',
-              'tarih': '16.12.2023',
-              'not': 'Pekiyi',
-              'aciklama': 'Farklı duygu ifadelerini tanıma ve ifade etme',
-            },
-          ]
-        : [
-            {
-              'ders': 'Öz Bakım ve Günlük Yaşam Becerileri',
-              'baslik': 'Düğme İlikleme',
-              'tarih': '20.12.2023',
-              'aciklama': 'Büyük düğmeleri ilikleme pratiği yapma',
-            },
-            {
-              'ders': 'Psikomotor Gelişim',
-              'baslik': 'Çizgi Çalışması',
-              'tarih': '21.12.2023',
-              'aciklama': 'Zig-zag çizgileri takip etme çalışması',
-            },
-            {
-              'ders': 'Sanat ve Estetik',
-              'baslik': 'Serbest Resim',
-              'tarih': '20.12.2023',
-              'aciklama': 'Sevdiği bir konuda resim yapma',
-            },
-            {
-              'ders': 'Destekleyici Eğitim Etkinlikleri',
-              'baslik': 'Hafıza Oyunu',
-              'tarih': '19.12.2023',
-              'aciklama': 'Eşleştirme kartları ile hafıza geliştirme',
-            },
-            {
-              'ders': 'Beden Eğitimi ve Oyun',
-              'baslik': 'Top Atma-Tutma',
-              'tarih': '22.12.2023',
-              'aciklama': 'Yumuşak top ile atma-tutma koordinasyon çalışması',
-            },
-          ];
-
-    // Ders filtresi uygula
-    if (_selectedDers != null) {
-      return allOdevler
-          .where((odev) => odev['ders'] == _selectedDers)
-          .toList();
-    }
-
-    return allOdevler;
+  // Tamamlananlar için placeholder widget
+  Widget _buildTamamlananList() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.check_circle_outline, size: 64, color: Colors.grey[300]),
+          const SizedBox(height: 16),
+          Text(
+            "Tamamlanan ödevler",
+            style: TextStyle(color: Colors.grey[600], fontSize: 16),
+          ),
+        ],
+      ),
+    );
   }
 
-  Widget _buildOdevCard(Map<String, dynamic> odev, bool isTamamlandi) {
+  // isTamamlandi parametresi UI rengi veya buton kontrolü için
+  Widget _buildOdevCard(
+    Map<String, dynamic> odev,
+    String docId,
+    bool isTamamlandi,
+  ) {
     // Ders rengini belirle
-    Color getDersColor(String ders) {
+    Color getDersColor(String? ders) {
+      if (ders == null) return Colors.grey;
       for (var alan in _akademikAlanlar) {
         if (alan['ad'] == ders) {
           return alan['renk'];
         }
       }
-      return Colors.grey;
+      return Colors.grey; // Varsayılan renk
     }
 
-    final color = getDersColor(odev['ders']);
+    final String ders = odev['ders'] ?? 'Genel';
+    final color = getDersColor(ders);
+
+    // Tarih formatlama
+    String tarihText = '';
+    if (odev['teslimTarihi'] != null) {
+      // String olarak geliyorsa direkt, Timestamp geliyorsa formatla
+      if (odev['teslimTarihi'] is Timestamp) {
+        tarihText = DateFormat(
+          'dd.MM.yyyy',
+        ).format((odev['teslimTarihi'] as Timestamp).toDate());
+      } else {
+        tarihText = odev['teslimTarihi'].toString();
+      }
+    }
 
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
@@ -374,18 +363,14 @@ class _OdevlerimVeliState extends State<OdevlerimVeli>
                     shape: BoxShape.circle,
                     border: Border.all(color: color.withOpacity(0.3)),
                   ),
-                  child: Icon(
-                    _getDersIcon(odev['ders']),
-                    color: color,
-                    size: 20,
-                  ),
+                  child: Icon(_getDersIcon(ders), color: color, size: 20),
                 ),
                 const SizedBox(width: 12),
-                
+
                 // Ders Adı
                 Expanded(
                   child: Text(
-                    odev['ders'],
+                    ders,
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
@@ -393,31 +378,32 @@ class _OdevlerimVeliState extends State<OdevlerimVeli>
                     ),
                   ),
                 ),
-                
+
                 // Tarih
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: color.withOpacity(0.3)),
-                  ),
-                  child: Text(
-                    odev['tarih'],
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color: color,
+                if (tarihText.isNotEmpty)
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(color: color.withOpacity(0.3)),
+                    ),
+                    child: Text(
+                      tarihText,
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: color,
+                      ),
                     ),
                   ),
-                ),
               ],
             ),
           ),
-          
+
           // İçerik
           Padding(
             padding: const EdgeInsets.all(16),
@@ -426,7 +412,7 @@ class _OdevlerimVeliState extends State<OdevlerimVeli>
               children: [
                 // Başlık
                 Text(
-                  odev['baslik'],
+                  odev['baslik'] ?? 'Başlıksız Ödev',
                   style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -434,17 +420,40 @@ class _OdevlerimVeliState extends State<OdevlerimVeli>
                   ),
                 ),
                 const SizedBox(height: 8),
-                
+
                 // Açıklama
-                Text(
-                  odev['aciklama'],
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey[700],
-                    height: 1.4,
+                if (odev['aciklama'] != null)
+                  Text(
+                    odev['aciklama'],
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey[700],
+                      height: 1.4,
+                    ),
                   ),
-                ),
-                
+
+                const SizedBox(height: 16),
+
+                // Dosya Görüntüleme Butonu
+                if (odev['dosyaUrl'] != null &&
+                    (odev['dosyaUrl'] as String).isNotEmpty)
+                  SizedBox(
+                    width: double.infinity,
+                    child: OutlinedButton.icon(
+                      onPressed: () => _launchURL(odev['dosyaUrl']),
+                      icon: const Icon(Icons.file_present),
+                      label: Text(odev['dosyaAdi'] ?? 'Dosyayı Görüntüle'),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: color,
+                        side: BorderSide(color: color),
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                    ),
+                  ),
+
                 // Öğretmen Notu (sadece tamamlananlar için)
                 if (isTamamlandi && odev.containsKey('not')) ...[
                   const SizedBox(height: 16),
@@ -485,7 +494,7 @@ class _OdevlerimVeliState extends State<OdevlerimVeli>
               ],
             ),
           ),
-          
+
           // Action Butonu (sadece bekleyenler için)
           if (!isTamamlandi)
             Padding(
@@ -494,7 +503,7 @@ class _OdevlerimVeliState extends State<OdevlerimVeli>
                 width: double.infinity,
                 child: ElevatedButton.icon(
                   onPressed: () {
-                    _odeviTamamlaDialog(odev);
+                    _odeviTamamlaDialog(odev, docId);
                   },
                   icon: const Icon(Icons.check_circle_outline, size: 20),
                   label: const Text("Ödevi Tamamla"),
@@ -524,7 +533,7 @@ class _OdevlerimVeliState extends State<OdevlerimVeli>
     return Icons.menu_book_rounded;
   }
 
-  void _odeviTamamlaDialog(Map<String, dynamic> odev) {
+  void _odeviTamamlaDialog(Map<String, dynamic> odev, String docId) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -534,11 +543,8 @@ class _OdevlerimVeliState extends State<OdevlerimVeli>
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              odev['baslik'],
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
-              ),
+              odev['baslik'] ?? 'Ödev',
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
             ),
             const SizedBox(height: 8),
             Text(
@@ -553,11 +559,17 @@ class _OdevlerimVeliState extends State<OdevlerimVeli>
             child: const Text("İptal"),
           ),
           ElevatedButton(
-            onPressed: () {
+            onPressed: () async {
+              // Burada tamamlandı mantığı eklenebilir.
+              // Örneğin: 'bekleyenOdevler'den silip 'tamamlananOdevler'e taşıyabiliriz.
+              // Şimdilik sadece mesaj gösteriyoruz.
               Navigator.pop(context);
+
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: Text("${odev['baslik']} ödevi tamamlandı olarak işaretlendi"),
+                  content: Text(
+                    "${odev['baslik']} ödevi tamamlandı olarak işaretlendi",
+                  ),
                   backgroundColor: Colors.green,
                 ),
               );

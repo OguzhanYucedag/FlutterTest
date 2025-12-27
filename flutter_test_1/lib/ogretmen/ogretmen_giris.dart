@@ -84,9 +84,7 @@ class OgretmenGirisPage extends StatelessWidget {
                           Container(
                             padding: const EdgeInsets.all(12),
                             decoration: BoxDecoration(
-                              color: const Color(
-                                0xFF1565C0,
-                              ).withOpacity(0.1),
+                              color: const Color(0xFF1565C0).withOpacity(0.1),
                               shape: BoxShape.circle,
                               border: Border.all(
                                 color: const Color(0xFF1565C0),
@@ -267,7 +265,8 @@ class OgretmenGirisPage extends StatelessWidget {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const EvOdevleriPage(),
+                            builder: (context) =>
+                                EvOdevleriPage(teacherName: ad),
                           ),
                         );
                       },

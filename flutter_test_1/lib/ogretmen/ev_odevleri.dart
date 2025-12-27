@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'dart:math';
-import 'package:image_picker_for_web/image_picker_for_web.dart';
+//import 'package:image_picker_for_web/image_picker_for_web.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -8,7 +8,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 
 class EvOdevleriPage extends StatefulWidget {
-  const EvOdevleriPage({super.key});
+  final String? teacherName;
+  const EvOdevleriPage({super.key, this.teacherName});
 
   @override
   State<EvOdevleriPage> createState() => _EvOdevleriPageState();
@@ -34,13 +35,62 @@ class _EvOdevleriPageState extends State<EvOdevleriPage> {
     'Beden Eğitimi ve Oyun',
   ];
 
-  final List<String> ogrencilerList = [
-    'Ahmet Yılmaz',
-    'Ayşe Kaya',
-    'Mehmet Demir',
-    'Zeynep Çelik',
-    'Can Yıldız',
-  ];
+  List<String> ogrencilerList = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchStudents();
+  }
+
+  Future<void> _fetchStudents() async {
+    if (widget.teacherName == null) return;
+
+    try {
+      // 1. Öğretmenin kurumunu bul
+      final teacherQuery = await FirebaseFirestore.instance
+          .collection('ogretmenler')
+          .where('kullanıcıAd', isEqualTo: widget.teacherName)
+          .limit(1)
+          .get();
+
+      if (teacherQuery.docs.isEmpty) {
+        debugPrint('Öğretmen bulunamadı: ${widget.teacherName}');
+        return;
+      }
+
+      final teacherData = teacherQuery.docs.first.data();
+      final String? institution = teacherData['bagliOlduguKurum'];
+
+      if (institution == null) {
+        debugPrint('Kurum bilgisi bulunamadı');
+        return;
+      }
+
+      // 2. Kuruma bağlı öğrencileri bul
+      final studentsQuery = await FirebaseFirestore.instance
+          .collection('ogrenciler')
+          .where('bagliOlduguKurum', isEqualTo: institution)
+          .get();
+
+      if (studentsQuery.docs.isNotEmpty) {
+        setState(() {
+          ogrencilerList = studentsQuery.docs
+              .map((doc) => doc.data()['kullanıcıAd'] as String?)
+              .where((name) => name != null)
+              .cast<String>()
+              .toList();
+        });
+      }
+    } catch (e) {
+      debugPrint('Öğrenci listesi alınırken hata: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Öğrenci listesi alınamadı: $e')),
+        );
+      }
+    }
+  }
 
   @override
   void dispose() {
@@ -80,7 +130,7 @@ class _EvOdevleriPageState extends State<EvOdevleriPage> {
 
   Future<void> secilecekDosya() async {
     FilePickerResult? result;
-    
+
     try {
       if (kIsWeb) {
         // Web için withData: true kullan
@@ -88,17 +138,37 @@ class _EvOdevleriPageState extends State<EvOdevleriPage> {
           withData: true,
           allowMultiple: false,
           type: FileType.custom,
-          allowedExtensions: ['pdf', 'jpg', 'jpeg', 'png', 'doc', 'docx', 'ppt', 'pptx', 'txt'],
+          allowedExtensions: [
+            'pdf',
+            'jpg',
+            'jpeg',
+            'png',
+            'doc',
+            'docx',
+            'ppt',
+            'pptx',
+            'txt',
+          ],
         );
       } else {
         // Mobil için normal pick
         result = await FilePicker.platform.pickFiles(
           allowMultiple: false,
           type: FileType.custom,
-          allowedExtensions: ['pdf', 'jpg', 'jpeg', 'png', 'doc', 'docx', 'ppt', 'pptx', 'txt'],
+          allowedExtensions: [
+            'pdf',
+            'jpg',
+            'jpeg',
+            'png',
+            'doc',
+            'docx',
+            'ppt',
+            'pptx',
+            'txt',
+          ],
         );
       }
-      
+
       if (result != null && result.files.isNotEmpty) {
         setState(() {
           secilenDosya = result!.files.first;
@@ -147,7 +217,7 @@ class _EvOdevleriPageState extends State<EvOdevleriPage> {
       String? downloadUrl;
       String? contentType;
       String? fileName;
-      
+
       if (secilenDosya != null) {
         try {
           final uploadResult = await _uploadFile(secilenDosya!);
@@ -227,8 +297,11 @@ class _EvOdevleriPageState extends State<EvOdevleriPage> {
     final String contentType = _inferContentType(fileName);
 
     // 3️⃣ Benzersiz dosya adı oluştur
-    final String uniqueFileName = '${DateTime.now().millisecondsSinceEpoch}_${fileName.replaceAll(RegExp(r'[^a-zA-Z0-9._-]'), '_')}';
-    final Reference ref = FirebaseStorage.instance.ref('odevler/$uniqueFileName');
+    final String uniqueFileName =
+        '${DateTime.now().millisecondsSinceEpoch}_${fileName.replaceAll(RegExp(r'[^a-zA-Z0-9._-]'), '_')}';
+    final Reference ref = FirebaseStorage.instance.ref(
+      'odevler/$uniqueFileName',
+    );
 
     UploadTask uploadTask;
 
@@ -238,7 +311,7 @@ class _EvOdevleriPageState extends State<EvOdevleriPage> {
       if (file.bytes == null) {
         throw Exception('Web için dosya byte verisi alınamadı');
       }
-      
+
       uploadTask = ref.putData(
         file.bytes!,
         SettableMetadata(contentType: contentType),
@@ -248,7 +321,7 @@ class _EvOdevleriPageState extends State<EvOdevleriPage> {
       if (file.path == null) {
         throw Exception('Mobil için dosya yolu alınamadı');
       }
-      
+
       // dart:io File sadece mobilde kullanılır
       final ioFile = File(file.path!);
       uploadTask = ref.putFile(
@@ -323,10 +396,7 @@ class _EvOdevleriPageState extends State<EvOdevleriPage> {
                 gradient: LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
-                  colors: [
-                    Color(0xFFFFB74D),
-                    Color(0xFFFF9800),
-                  ],
+                  colors: [Color(0xFFFFB74D), Color(0xFFFF9800)],
                 ),
                 borderRadius: BorderRadius.only(
                   bottomLeft: Radius.circular(30),
@@ -666,7 +736,10 @@ class _EvOdevleriPageState extends State<EvOdevleriPage> {
                       width: double.infinity,
                       child: ElevatedButton.icon(
                         onPressed: _submitHomework,
-                        icon: const Icon(Icons.send_rounded, color: Colors.white),
+                        icon: const Icon(
+                          Icons.send_rounded,
+                          color: Colors.white,
+                        ),
                         label: const Text(
                           'VELİYE GÖNDER',
                           style: TextStyle(
