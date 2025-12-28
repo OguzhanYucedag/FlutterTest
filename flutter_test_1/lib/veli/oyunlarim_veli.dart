@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../widgets/oyun_butonu.dart';
 import '../utils/sabitler.dart';
+import '../oyunlar/ulasim_oyunu.dart';
+import '../oyunlar/kart_eslestirme_oyunu.dart';
 import 'dart:math';
 
 class OyunlarimVeli extends StatefulWidget {
@@ -465,7 +467,16 @@ class _OyunlarimVeliState extends State<OyunlarimVeli> with SingleTickerProvider
               baslik: oyun['baslik'] as String,
               ikon: oyun['ikon'] as String,
               renk: oyun['renk'] as Color,
-              onTap: () => oyunuBaslat(oyun['tip'] as String),
+              onTap: () {
+                final tip = oyun['tip'] as String;
+                if (tip == 'ulasim') {
+                  Navigator.push(context, MaterialPageRoute(builder: (_) => const UlasimOyunu()));
+                } else if (tip == 'kart') {
+                  Navigator.push(context, MaterialPageRoute(builder: (_) => const KartEslestirmeOyunu()));
+                } else {
+                  oyunuBaslat(tip);
+                }
+              },
             );
           },
         ),
