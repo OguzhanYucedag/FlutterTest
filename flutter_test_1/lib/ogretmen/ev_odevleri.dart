@@ -587,7 +587,7 @@ class _EvOdevleriPageState extends State<EvOdevleriPage> {
                                 ),
                                 const SizedBox(width: 12),
                                 const Text(
-                                  'Belge / Görsel Ekle',
+                                  'Belge / Görsel Ekle (İsteğe Bağlı)',
                                   style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w600,

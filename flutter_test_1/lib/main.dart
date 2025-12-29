@@ -128,6 +128,7 @@ class _LoginPageState extends State<LoginPage> {
                         borderSide: BorderSide(color: Colors.grey),
                       ),
                       focusedBorder: const UnderlineInputBorder(
+                        
                         borderSide: BorderSide(
                           color: Colors.blue,
                         ), // Blue focus
