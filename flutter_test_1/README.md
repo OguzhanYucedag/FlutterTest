@@ -1,4 +1,4 @@
-# Okul Yönetim Sistemi (School Management System)
+# Okul Yönetim Sistemi 
 
 Bu proje, **Flutter** kullanılarak geliştirilmiş kapsamlı bir okul yönetim uygulamasıdır. Öğretmenler, veliler ve kurum yöneticileri için özel arayüzler ve işlevler sunar.
 
