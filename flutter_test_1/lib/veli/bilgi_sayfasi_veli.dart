@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
-class BilgiSayfasiVeli extends StatelessWidget {
+class BilgiSayfasiVeli extends StatefulWidget {
   final String? ad;
   final String? email;
   final String? tip;
@@ -17,6 +18,72 @@ class BilgiSayfasiVeli extends StatelessWidget {
     this.sinif,
     this.ogretmenAdi,
   });
+
+  @override
+  State<BilgiSayfasiVeli> createState() => _BilgiSayfasiVeliState();
+}
+
+class _BilgiSayfasiVeliState extends State<BilgiSayfasiVeli> {
+  String? _fetchedOgrenciAdi;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchOgrenciAdi();
+  }
+
+  Future<void> _fetchOgrenciAdi() async {
+    if (widget.ad == null) return;
+
+    try {
+      // 1. 'veliler' collection'unda 'kullanıcıAd' field'ı widget.ad ile eşleşen dökümanı bul
+      final veliQuery = await FirebaseFirestore.instance
+          .collection('veliler')
+          .where('kullanıcıAd', isEqualTo: widget.ad)
+          .limit(1)
+          .get();
+
+      if (veliQuery.docs.isEmpty) {
+        debugPrint('Veli bulunamadı: ${widget.ad}');
+        return;
+      }
+
+      // 'veliTelefon' bilgisini al
+      final veliData = veliQuery.docs.first.data();
+      final String? veliTelefon = veliData['veliTelefon'];
+
+      if (veliTelefon == null) {
+        debugPrint('Veli telefonu bulunamadı');
+        return;
+      }
+
+      // 2. 'ogrenciler' collection'unda 'VeliNumarası' field'ı veliTelefon ile eşleşen dökümanı bul
+      final ogrenciQuery = await FirebaseFirestore.instance
+          .collection('ogrenciler')
+          .where(
+            'VeliNumarası',
+            isEqualTo: veliTelefon,
+          ) // Field adı user isteğine göre 'VeliNumarası'
+          .limit(1)
+          .get();
+
+      if (ogrenciQuery.docs.isNotEmpty) {
+        // 'kullanıcıAd' değerini al (öğrenci adı)
+        final ogrenciData = ogrenciQuery.docs.first.data();
+        final String? ogrenciAdi = ogrenciData['kullanıcıAd'];
+
+        if (mounted && ogrenciAdi != null) {
+          setState(() {
+            _fetchedOgrenciAdi = ogrenciAdi;
+          });
+        }
+      } else {
+        debugPrint('Öğrenci bulunamadı (Veli No: $veliTelefon)');
+      }
+    } catch (e) {
+      debugPrint('Hata oluştu: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -52,12 +119,6 @@ class BilgiSayfasiVeli extends StatelessWidget {
                 _buildSectionTitle('Öğrenci Bilgileri'),
                 const SizedBox(height: 12),
                 _buildStudentInfoCard(),
-                const SizedBox(height: 24),
-
-                // Hızlı Erişim Linkleri
-                _buildSectionTitle('Hızlı Erişim'),
-                const SizedBox(height: 12),
-                _buildQuickLinks(),
                 const SizedBox(height: 24),
 
                 // Önemli Bilgiler
@@ -118,7 +179,7 @@ class BilgiSayfasiVeli extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Hoş Geldiniz, $ad!',
+                      'Hoş Geldiniz, ${widget.ad}!',
                       style: const TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.bold,
@@ -128,10 +189,7 @@ class BilgiSayfasiVeli extends StatelessWidget {
                     const SizedBox(height: 4),
                     const Text(
                       'Özel Eğitim Takip Sistemine erişiminiz sağlandı.',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.white70,
-                      ),
+                      style: TextStyle(fontSize: 14, color: Colors.white70),
                     ),
                   ],
                 ),
@@ -141,10 +199,7 @@ class BilgiSayfasiVeli extends StatelessWidget {
           const SizedBox(height: 16),
           const Text(
             '1. Kademe özel eğitim öğrencisinin gelişimini takip etmek için tüm araçlara buradan ulaşabilirsiniz.',
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.white,
-            ),
+            style: TextStyle(fontSize: 14, color: Colors.white),
           ),
         ],
       ),
@@ -189,7 +244,7 @@ class BilgiSayfasiVeli extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      ogrenciAdi ?? 'Bilgi Yok',
+                      _fetchedOgrenciAdi ?? widget.ogrenciAdi ?? 'Bilgi Yok',
                       style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -223,7 +278,7 @@ class BilgiSayfasiVeli extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      sinif ?? 'Bilgi Yok',
+                      widget.sinif ?? 'Bilgi Yok',
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
@@ -257,7 +312,7 @@ class BilgiSayfasiVeli extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      ogretmenAdi ?? 'Bilgi Yok',
+                      widget.ogretmenAdi ?? 'Bilgi Yok',
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
@@ -271,103 +326,6 @@ class BilgiSayfasiVeli extends StatelessWidget {
           ),
         ],
       ),
-    );
-  }
-
-  Widget _buildQuickLinks() {
-    final List<Map<String, dynamic>> links = [
-      {
-        'title': 'Gelişim Raporları',
-        'icon': Icons.assessment_outlined,
-        'description': 'Aylık gelişim takibi',
-        'color': Colors.orange,
-      },
-      {
-        'title': 'BEP Planları',
-        'icon': Icons.assignment_outlined,
-        'description': 'Bireyselleştirilmiş eğitim',
-        'color': Colors.green,
-      },
-      {
-        'title': 'Ödev Takibi',
-        'icon': Icons.assignment_turned_in_outlined,
-        'description': 'Günlük ödev kontrolü',
-        'color': Colors.purple,
-      },
-      {
-        'title': 'İletişim Günlüğü',
-        'icon': Icons.chat_outlined,
-        'description': 'Öğretmen iletişimi',
-        'color': Colors.red,
-      },
-    ];
-
-    return GridView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        crossAxisSpacing: 12,
-        mainAxisSpacing: 12,
-        childAspectRatio: 1.2,
-      ),
-      itemCount: links.length,
-      itemBuilder: (context, index) {
-        return Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(12),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.grey.withOpacity(0.1),
-                blurRadius: 6,
-                offset: const Offset(0, 2),
-              ),
-            ],
-            border: Border.all(color: Colors.grey[200]!),
-          ),
-          child: Material(
-            color: Colors.transparent,
-            child: InkWell(
-              borderRadius: BorderRadius.circular(12),
-              onTap: () {
-                // Link işlevselliği buraya eklenebilir
-              },
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      links[index]['icon'],
-                      color: links[index]['color'],
-                      size: 28,
-                    ),
-                    const SizedBox(height: 12),
-                    Text(
-                      links[index]['title'],
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.black87,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      links[index]['description'],
-                      style: const TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        );
-      },
     );
   }
 
@@ -413,7 +371,9 @@ class BilgiSayfasiVeli extends StatelessWidget {
           _buildInfoItem('• Gelişim raporları her ayın sonunda güncellenir'),
           _buildInfoItem('• BEP toplantıları dönem başında planlanır'),
           _buildInfoItem('• Ödev takibi her gün saat 17:00\'a kadar yapılır'),
-          _buildInfoItem('• Acil durumlarda öğretmen ile doğrudan iletişim kurulabilir'),
+          _buildInfoItem(
+            '• Acil durumlarda öğretmen ile doğrudan iletişim kurulabilir',
+          ),
         ],
       ),
     );
@@ -424,10 +384,7 @@ class BilgiSayfasiVeli extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Text(
         text,
-        style: const TextStyle(
-          fontSize: 13,
-          color: Colors.black87,
-        ),
+        style: const TextStyle(fontSize: 13, color: Colors.black87),
       ),
     );
   }
@@ -467,11 +424,8 @@ class BilgiSayfasiVeli extends StatelessWidget {
               ),
               const SizedBox(width: 8),
               Text(
-                email ?? 'bilgi@okul.edu.tr',
-                style: const TextStyle(
-                  fontSize: 14,
-                  color: Colors.black87,
-                ),
+                widget.email ?? 'bilgi@okul.edu.tr',
+                style: const TextStyle(fontSize: 14, color: Colors.black87),
               ),
             ],
           ),
@@ -486,10 +440,7 @@ class BilgiSayfasiVeli extends StatelessWidget {
               const SizedBox(width: 8),
               const Text(
                 '0 (XXX) XXX XX XX',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.black87,
-                ),
+                style: TextStyle(fontSize: 14, color: Colors.black87),
               ),
             ],
           ),

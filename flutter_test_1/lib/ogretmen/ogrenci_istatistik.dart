@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class OgrenciIstatistikPage extends StatefulWidget {
   final String? ogretmenAdi;
@@ -47,80 +48,123 @@ class _OgrenciIstatistikPageState extends State<OgrenciIstatistikPage> {
   };
 
   // Dummy Data - Öğrenciler
-  final List<Map<String, dynamic>> _studentStats = [
-    {
-      'name': 'Ahmet Yılmaz',
-      'avatarColor': Colors.blue,
-      'teacherComment':
-          'Ahmet matematik alanında çok başarılı, ancak sosyal becerilerde biraz desteğe ihtiyacı var.',
-      'subjects': [
-        {'name': 'Akademik Alanlar', 'progress': 0.85},
-        {'name': 'Dil ve İletişim Gelişimi', 'progress': 0.70},
-        {'name': 'Sosyal ve Duygusal Gelişim', 'progress': 0.90},
-        {'name': 'Öz Bakım ve Günlük Yaşam Becerileri', 'progress': 0.78},
-        {'name': 'Psikomotor Gelişim', 'progress': 0.82},
-      ],
-    },
-    {
-      'name': 'Ayşe Kaya',
-      'avatarColor': Colors.purple,
-      'teacherComment':
-          'Ayşe sanat ve estetik alanında çok yetenekli, yaratıcılığı takdire şayan.',
-      'subjects': [
-        {'name': 'Akademik Alanlar', 'progress': 0.95},
-        {'name': 'Dil ve İletişim Gelişimi', 'progress': 0.88},
-        {'name': 'Sosyal ve Duygusal Gelişim', 'progress': 0.92},
-        {'name': 'Sanat ve Estetik', 'progress': 0.96},
-        {'name': 'Destekleyici Eğitim Etkinlikleri', 'progress': 0.89},
-      ],
-    },
-    {
-      'name': 'Can Yıldız',
-      'avatarColor': Colors.teal,
-      'teacherComment':
-          'Can beden eğitiminde çok başarılı, ancak akademik alanlarda desteğe ihtiyacı var.',
-      'subjects': [
-        {'name': 'Akademik Alanlar', 'progress': 0.65},
-        {'name': 'Beden Eğitimi ve Oyun', 'progress': 0.95},
-        {'name': 'Psikomotor Gelişim', 'progress': 0.92},
-        {'name': 'Sosyal ve Duygusal Gelişim', 'progress': 0.75},
-        {'name': 'Öz Bakım ve Günlük Yaşam Becerileri', 'progress': 0.70},
-      ],
-    },
-    {
-      'name': 'Zeynep Çelik',
-      'avatarColor': Colors.orange,
-      'teacherComment':
-          'Zeynep dil becerilerinde çok iyi, iletişim kurma konusunda örnek bir öğrenci.',
-      'subjects': [
-        {'name': 'Dil ve İletişim Gelişimi', 'progress': 0.92},
-        {'name': 'Sanat ve Estetik', 'progress': 0.88},
-        {'name': 'Akademik Alanlar', 'progress': 0.78},
-        {'name': 'Destekleyici Eğitim Etkinlikleri', 'progress': 0.85},
-        {'name': 'Sosyal ve Duygusal Gelişim', 'progress': 0.91},
-      ],
-    },
-    {
-      'name': 'Mehmet Demir',
-      'avatarColor': Colors.green,
-      'teacherComment':
-          'Mehmet fiziksel aktivitelerde çok başarılı, ancak dil becerilerini geliştirmeye ihtiyacı var.',
-      'subjects': [
-        {'name': 'Beden Eğitimi ve Oyun', 'progress': 0.85},
-        {'name': 'Psikomotor Gelişim', 'progress': 0.80},
-        {'name': 'Akademik Alanlar', 'progress': 0.55},
-        {'name': 'Dil ve İletişim Gelişimi', 'progress': 0.60},
-        {'name': 'Öz Bakım ve Günlük Yaşam Becerileri', 'progress': 0.75},
-      ],
-    },
-  ];
+  // Öğrenciler ve Yüklenme Durumu
+  List<Map<String, dynamic>> _studentStats = [];
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _commentController = TextEditingController();
+    _fetchStudents();
+  }
+
+  Future<void> _fetchStudents() async {
+    debugPrint('Öğrenci getirme işlemi başladı...');
+    try {
+      if (widget.ogretmenAdi == null) {
+        debugPrint('HATA: widget.ogretmenAdi null!');
+        setState(() => _isLoading = false);
+        return;
+      }
+
+      final teacherName = widget.ogretmenAdi!.trim();
+      debugPrint('Aranan Öğretmen Adı: "$teacherName"');
+
+      // 1. Öğretmeni bul
+      final teacherQuery = await FirebaseFirestore.instance
+          .collection('ogretmenler')
+          .where('kullanıcıAd', isEqualTo: teacherName)
+          .get();
+
+      debugPrint(
+        'Öğretmen sorgusu sonucu: ${teacherQuery.docs.length} doküman bulundu.',
+      );
+
+      if (teacherQuery.docs.isEmpty) {
+        debugPrint('HATA: Öğretmen veritabanında bulunamadı.');
+        setState(() => _isLoading = false);
+        return;
+      }
+
+      final teacherDoc = teacherQuery.docs.first;
+      final teacherData = teacherDoc.data();
+      debugPrint('Öğretmen verisi: $teacherData');
+
+      final institution = teacherData['bagliOlduguKurum'];
+      debugPrint('Bağlı Olduğu Kurum: $institution');
+
+      if (institution == null) {
+        debugPrint('HATA: Kurum bilgisi (bagliOlduguKurum) null.');
+        setState(() => _isLoading = false);
+        return;
+      }
+
+      // 2. Kuruma bağlı öğrencileri bul
+      debugPrint('Öğrenciler aranıyor (bagliOlduguKurum: "$institution")...');
+      final studentsQuery = await FirebaseFirestore.instance
+          .collection('ogrenciler')
+          .where('bagliOlduguKurum', isEqualTo: institution)
+          .get();
+
+      debugPrint(
+        'Öğrenci sorgusu sonucu: ${studentsQuery.docs.length} öğrenci bulundu.',
+      );
+
+      // Renk listesi (Rastgele seçim için)
+      final List<Color> colors = [
+        Colors.blue,
+        Colors.purple,
+        Colors.teal,
+        Colors.orange,
+        Colors.green,
+        Colors.red,
+        Colors.indigo,
+        Colors.pink,
+      ];
+
+      final List<Map<String, dynamic>> loadedStudents = [];
+      int colorIndex = 0;
+
+      for (var doc in studentsQuery.docs) {
+        final data = doc.data();
+        debugPrint('Bulunan Öğrenci: ${data['kullanıcıAd']}');
+
+        final studentName = data['kullanıcıAd'] ?? 'İsimsiz';
+
+        loadedStudents.add({
+          'name': studentName,
+          'avatarColor': colors[colorIndex % colors.length],
+          'teacherComment': '', // Başlangıçta boş
+          'subjects': [], // Boş liste
+        });
+        colorIndex++;
+      }
+
+      setState(() {
+        _studentStats = loadedStudents;
+        _isLoading = false;
+      });
+    } catch (e) {
+      debugPrint('CRITICAL ERROR Veri çekme hatası: $e');
+      if (mounted) {
+        setState(() => _isLoading = false);
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Hata: $e')));
+      }
+    }
+  }
 
   // Sınıf ortalaması hesapla
   Map<String, double> _calculateClassAverages() {
     final Map<String, List<double>> progressMap = {};
 
     for (var student in _studentStats) {
-      for (var subject in student['subjects']) {
+      final subjects = student['subjects'] as List?;
+      if (subjects == null || subjects.isEmpty) continue;
+
+      for (var subject in subjects) {
         final subjectName = subject['name'];
         final progress = subject['progress'];
 
@@ -141,12 +185,6 @@ class _OgrenciIstatistikPageState extends State<OgrenciIstatistikPage> {
   // Yorum düzenleme için state
   int? _selectedStudentIndex;
   TextEditingController _commentController = TextEditingController();
-
-  @override
-  void initState() {
-    super.initState();
-    _commentController = TextEditingController();
-  }
 
   @override
   void dispose() {
@@ -250,6 +288,17 @@ class _OgrenciIstatistikPageState extends State<OgrenciIstatistikPage> {
 
   @override
   Widget build(BuildContext context) {
+    if (_isLoading) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+
+    if (_studentStats.isEmpty) {
+      return Scaffold(
+        appBar: AppBar(title: const Text('Öğrenci İstatistikleri')),
+        body: const Center(child: Text('Görüntülenecek öğrenci bulunamadı.')),
+      );
+    }
+
     final classAverages = _calculateClassAverages();
 
     // En başarılı 3 alanı sırala
@@ -496,14 +545,14 @@ class _OgrenciIstatistikPageState extends State<OgrenciIstatistikPage> {
   }
 
   Widget _buildStudentStatCard(Map<String, dynamic> student, int studentIndex) {
-    final List<Map<String, dynamic>> subjects = List<Map<String, dynamic>>.from(
-      student['subjects'],
-    );
+    final List<Map<String, dynamic>> subjects =
+        (student['subjects'] as List?)?.cast<Map<String, dynamic>>() ?? [];
 
     // İlerleme ortalaması hesapla
-    final double averageProgress =
-        subjects.map((s) => s['progress'] as double).reduce((a, b) => a + b) /
-        subjects.length;
+    final double averageProgress = subjects.isEmpty
+        ? 0.0
+        : subjects.map((s) => s['progress'] as double).reduce((a, b) => a + b) /
+              subjects.length;
 
     final String teacherComment = student['teacherComment'] ?? '';
 
@@ -674,23 +723,36 @@ class _OgrenciIstatistikPageState extends State<OgrenciIstatistikPage> {
             ),
 
             // Ders İlerlemeleri
-            const Divider(color: Colors.grey, height: 20),
-            const SizedBox(height: 8),
-            const Text(
-              'Ders İlerlemeleri',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 14,
-                color: Color(0xFF455A64),
+            if (subjects.isNotEmpty) ...[
+              const Divider(color: Colors.grey, height: 20),
+              const SizedBox(height: 8),
+              const Text(
+                'Ders İlerlemeleri',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 14,
+                  color: Color(0xFF455A64),
+                ),
               ),
-            ),
-            const SizedBox(height: 12),
-            ...subjects.map((subject) {
-              final color = _fieldColors[subject['name']] ?? Colors.grey;
-              final icon = _fieldIcons[subject['name']] ?? Icons.category;
+              const SizedBox(height: 12),
+              ...subjects.map((subject) {
+                final color = _fieldColors[subject['name']] ?? Colors.grey;
+                final icon = _fieldIcons[subject['name']] ?? Icons.category;
 
-              return _buildSubjectProgressItem(subject, color, icon);
-            }),
+                return _buildSubjectProgressItem(subject, color, icon);
+              }),
+            ] else
+              Padding(
+                padding: const EdgeInsets.only(top: 16),
+                child: Text(
+                  'Henüz istatistik verisi girilmemiş.',
+                  style: TextStyle(
+                    color: Colors.grey[500],
+                    fontSize: 13,
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
+              ),
           ],
         ),
       ),

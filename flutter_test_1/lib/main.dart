@@ -60,7 +60,7 @@ class _LoginPageState extends State<LoginPage> {
                 image: const AssetImage('assets/images/login_bg.jpg'),
                 fit: BoxFit.cover,
                 colorFilter: ColorFilter.mode(
-                  Colors.white.withOpacity(0.8),
+                  Colors.white.withValues(alpha: 0.8),
                   BlendMode.lighten,
                 ),
               ),
@@ -161,7 +161,7 @@ class _LoginPageState extends State<LoginPage> {
                           borderRadius: BorderRadius.circular(32),
                         ),
                         elevation: 4,
-                        shadowColor: Colors.blue.withOpacity(0.3),
+                        shadowColor: Colors.blue.withValues(alpha: 0.3),
                       ),
                       onPressed: _girisYap,
                       child: const Text(
