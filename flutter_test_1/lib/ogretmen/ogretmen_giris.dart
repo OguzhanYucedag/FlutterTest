@@ -345,35 +345,6 @@ class OgretmenGirisPage extends StatelessWidget {
                   ],
                 ),
               ),
-
-              // Alt Bilgi
-              Container(
-                margin: const EdgeInsets.only(top: 20, bottom: 10),
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.1),
-                      blurRadius: 10,
-                      offset: const Offset(0, -2),
-                    ),
-                  ],
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Son giriş: Bugün, 10:30',
-                      style: TextStyle(
-                        color: Colors.blueGrey[600],
-                        fontSize: 12,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
             ],
           ),
         ),

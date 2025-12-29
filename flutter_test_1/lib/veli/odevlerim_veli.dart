@@ -642,7 +642,7 @@ class _OdevlerimVeliState extends State<OdevlerimVeli>
                 // Yükleniyor göstergesi veya buton disable yapılabilir ama şimdilik dialogu kapatıp işlem yapalım.
                 Navigator.pop(context);
 
-                // 1. 'gonderilenOdevler' ve 'notlar' koleksiyonlarına ekle
+                // 1. 'gonderilenOdevler' ve 'bekleyenödevler' koleksiyonlarına ekle
                 final data = {
                   ...odev,
                   'tamamlanmaTarihi': FieldValue.serverTimestamp(),

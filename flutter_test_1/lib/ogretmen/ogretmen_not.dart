@@ -10,6 +10,37 @@ class OgretmenNotPage extends StatefulWidget {
 }
 
 class _OgretmenNotPageState extends State<OgretmenNotPage> {
+  String? bagliOlduguKurum;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchTeacherInfo();
+  }
+
+  Future<void> _fetchTeacherInfo() async {
+    if (widget.teacherName == null) return;
+
+    try {
+      final snapshot = await FirebaseFirestore.instance
+          .collection('ogretmenler')
+          .where('ad', isEqualTo: widget.teacherName)
+          .limit(1)
+          .get();
+
+      if (snapshot.docs.isNotEmpty) {
+        setState(() {
+          bagliOlduguKurum = snapshot.docs.first['bagliOlduguKurum'];
+        });
+        print('Kurum bulundu: $bagliOlduguKurum');
+      } else {
+        print('Öğretmen bulunamadı: ${widget.teacherName}');
+      }
+    } catch (e) {
+      print('Kurum bilgisi çekme hatası: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
