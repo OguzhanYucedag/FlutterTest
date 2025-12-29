@@ -291,7 +291,8 @@ class OgretmenGirisPage extends StatelessWidget {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const OgretmenNotPage(),
+                            builder: (context) =>
+                                OgretmenNotPage(teacherName: ad),
                           ),
                         );
                       },

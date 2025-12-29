@@ -510,11 +510,10 @@ class _OdevlerimVeliState extends State<OdevlerimVeli>
                     ),
                   ),
 
-                const SizedBox(height: 16),
-
                 // Dosya Görüntüleme Butonu
                 if (odev['dosyaUrl'] != null &&
-                    (odev['dosyaUrl'] as String).isNotEmpty)
+                    (odev['dosyaUrl'] as String).isNotEmpty) ...[
+                  const SizedBox(height: 16),
                   SizedBox(
                     width: double.infinity,
                     child: OutlinedButton.icon(
@@ -531,6 +530,7 @@ class _OdevlerimVeliState extends State<OdevlerimVeli>
                       ),
                     ),
                   ),
+                ],
 
                 // Öğretmen Notu (sadece tamamlananlar için)
                 if (isTamamlandi && odev.containsKey('not')) ...[

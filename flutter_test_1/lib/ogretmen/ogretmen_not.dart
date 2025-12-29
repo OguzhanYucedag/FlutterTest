@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class OgretmenNotPage extends StatefulWidget {
-  const OgretmenNotPage({super.key});
+  final String? teacherName;
+  const OgretmenNotPage({super.key, this.teacherName});
 
   @override
   State<OgretmenNotPage> createState() => _OgretmenNotPageState();
