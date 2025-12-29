@@ -121,12 +121,6 @@ class _BilgiSayfasiVeliState extends State<BilgiSayfasiVeli> {
                 _buildStudentInfoCard(),
                 const SizedBox(height: 24),
 
-                // Hızlı Erişim Linkleri
-                _buildSectionTitle('Hızlı Erişim'),
-                const SizedBox(height: 12),
-                _buildQuickLinks(),
-                const SizedBox(height: 24),
-
                 // Önemli Bilgiler
                 _buildSectionTitle('Önemli Bilgiler'),
                 const SizedBox(height: 12),
@@ -332,100 +326,6 @@ class _BilgiSayfasiVeliState extends State<BilgiSayfasiVeli> {
           ),
         ],
       ),
-    );
-  }
-
-  Widget _buildQuickLinks() {
-    final List<Map<String, dynamic>> links = [
-      {
-        'title': 'Gelişim Raporları',
-        'icon': Icons.assessment_outlined,
-        'description': 'Aylık gelişim takibi',
-        'color': Colors.orange,
-      },
-      {
-        'title': 'BEP Planları',
-        'icon': Icons.assignment_outlined,
-        'description': 'Bireyselleştirilmiş eğitim',
-        'color': Colors.green,
-      },
-      {
-        'title': 'Ödev Takibi',
-        'icon': Icons.assignment_turned_in_outlined,
-        'description': 'Günlük ödev kontrolü',
-        'color': Colors.purple,
-      },
-      {
-        'title': 'İletişim Günlüğü',
-        'icon': Icons.chat_outlined,
-        'description': 'Öğretmen iletişimi',
-        'color': Colors.red,
-      },
-    ];
-
-    return GridView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        crossAxisSpacing: 12,
-        mainAxisSpacing: 12,
-        childAspectRatio: 1.2,
-      ),
-      itemCount: links.length,
-      itemBuilder: (context, index) {
-        return Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(12),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.grey.withOpacity(0.1),
-                blurRadius: 6,
-                offset: const Offset(0, 2),
-              ),
-            ],
-            border: Border.all(color: Colors.grey[200]!),
-          ),
-          child: Material(
-            color: Colors.transparent,
-            child: InkWell(
-              borderRadius: BorderRadius.circular(12),
-              onTap: () {
-                // Link işlevselliği buraya eklenebilir
-              },
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      links[index]['icon'],
-                      color: links[index]['color'],
-                      size: 28,
-                    ),
-                    const SizedBox(height: 12),
-                    Text(
-                      links[index]['title'],
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.black87,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      links[index]['description'],
-                      style: const TextStyle(fontSize: 12, color: Colors.grey),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        );
-      },
     );
   }
 

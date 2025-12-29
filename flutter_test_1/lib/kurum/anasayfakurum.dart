@@ -3,6 +3,7 @@ import 'package:flutter_test_1/main.dart';
 import 'ogretmen_ayarları.dart';
 import 'ogrenci_ayarları.dart';
 import 'kurum_profil.dart';
+import 'kurum_girilen_notlar.dart';
 
 class AnasayfaPageKurum extends StatelessWidget {
   const AnasayfaPageKurum({super.key, this.ad, this.email, this.tip});
@@ -115,9 +116,7 @@ class AnasayfaPageKurum extends StatelessWidget {
                           Container(
                             padding: const EdgeInsets.all(12),
                             decoration: BoxDecoration(
-                              color: const Color(
-                                0xFF1E88E5,
-                              ).withOpacity(0.1),
+                              color: const Color(0xFF1E88E5).withOpacity(0.1),
                               shape: BoxShape.circle,
                             ),
                             child: const Icon(
@@ -179,9 +178,8 @@ class AnasayfaPageKurum extends StatelessWidget {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => OgretmenAyarlariPage(
-                              baglikurum: ad,
-                            ),
+                            builder: (context) =>
+                                OgretmenAyarlariPage(baglikurum: ad),
                           ),
                         );
                       },
@@ -201,9 +199,29 @@ class AnasayfaPageKurum extends StatelessWidget {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => OgrenciAyarlariPage(
-                              baglikurum: ad,
-                            ),
+                            builder: (context) =>
+                                OgrenciAyarlariPage(baglikurum: ad),
+                          ),
+                        );
+                      },
+                    ),
+                    _buildMenuCard(
+                      context,
+                      title: 'Girilen Notlar',
+                      description: 'Öğrencilerin notlarını görüntüle',
+                      icon: Icons.fact_check_rounded,
+                      iconColor: Colors.purple,
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFFAB47BC), Color(0xFF7B1FA2)],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                const KurumGirilenNotlarPage(),
                           ),
                         );
                       },
@@ -318,10 +336,7 @@ class AnasayfaPageKurum extends StatelessWidget {
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(
-                color: Colors.grey.withOpacity(0.1),
-                width: 1,
-              ),
+              border: Border.all(color: Colors.grey.withOpacity(0.1), width: 1),
             ),
             child: Row(
               children: [

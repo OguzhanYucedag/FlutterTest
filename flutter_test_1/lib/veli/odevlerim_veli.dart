@@ -278,18 +278,96 @@ class _OdevlerimVeliState extends State<OdevlerimVeli>
 
   // Tamamlananlar için placeholder widget
   Widget _buildTamamlananList() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.check_circle_outline, size: 64, color: Colors.grey[300]),
-          const SizedBox(height: 16),
-          Text(
-            "Tamamlanan ödevler",
-            style: TextStyle(color: Colors.grey[600], fontSize: 16),
-          ),
-        ],
-      ),
+    if (widget.ogrenciAdi == null) {
+      return const Center(child: Text("Öğrenci bilgisi bulunamadı."));
+    }
+
+    Query query = FirebaseFirestore.instance
+        .collection('gonderilenOdevler')
+        .where('ogrenci', isEqualTo: widget.ogrenciAdi);
+
+    return StreamBuilder<QuerySnapshot>(
+      stream: query.snapshots(),
+      builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          return Center(child: Text('Bir hata oluştu: ${snapshot.error}'));
+        }
+
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.check_circle_outline,
+                  size: 64,
+                  color: Colors.grey[300],
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  "Tamamlanan ödev bulunmamaktadır",
+                  style: TextStyle(color: Colors.grey[600], fontSize: 16),
+                ),
+              ],
+            ),
+          );
+        }
+
+        final docs = snapshot.data!.docs;
+
+        return ListView.builder(
+          padding: const EdgeInsets.all(16),
+          itemCount: docs.length,
+          itemBuilder: (context, index) {
+            final doc = docs[index];
+            final data = doc.data() as Map<String, dynamic>;
+            final baslik = data['baslik'] ?? 'Başlıksız Ödev';
+            final dosyaUrl = data['dosyaUrl'] as String?;
+
+            return Card(
+              margin: const EdgeInsets.only(bottom: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              elevation: 2,
+              child: ListTile(
+                contentPadding: const EdgeInsets.all(16),
+                leading: const CircleAvatar(
+                  backgroundColor: Colors.green,
+                  child: Icon(Icons.check, color: Colors.white),
+                ),
+                title: Text(
+                  baslik,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
+                ),
+                subtitle: data['tamamlanmaTarihi'] != null
+                    ? Text(
+                        "Tamamlanma: ${data['tamamlanmaTarihi'] is Timestamp ? DateFormat('dd.MM.yyyy HH:mm').format((data['tamamlanmaTarihi'] as Timestamp).toDate()) : ''}",
+                        style: const TextStyle(fontSize: 12),
+                      )
+                    : null,
+                trailing: dosyaUrl != null && dosyaUrl.isNotEmpty
+                    ? IconButton(
+                        icon: const Icon(
+                          Icons.file_present,
+                          color: Colors.blue,
+                        ),
+                        onPressed: () => _launchURL(dosyaUrl),
+                        tooltip: 'Dosyayı Aç',
+                      )
+                    : null,
+              ),
+            );
+          },
+        );
+      },
     );
   }
 
@@ -560,19 +638,53 @@ class _OdevlerimVeliState extends State<OdevlerimVeli>
           ),
           ElevatedButton(
             onPressed: () async {
-              // Burada tamamlandı mantığı eklenebilir.
-              // Örneğin: 'bekleyenOdevler'den silip 'tamamlananOdevler'e taşıyabiliriz.
-              // Şimdilik sadece mesaj gösteriyoruz.
-              Navigator.pop(context);
+              try {
+                // Yükleniyor göstergesi veya buton disable yapılabilir ama şimdilik dialogu kapatıp işlem yapalım.
+                Navigator.pop(context);
 
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(
-                    "${odev['baslik']} ödevi tamamlandı olarak işaretlendi",
-                  ),
-                  backgroundColor: Colors.green,
-                ),
-              );
+                // 1. 'gonderilenOdevler' ve 'notlar' koleksiyonlarına ekle
+                final data = {
+                  ...odev,
+                  'tamamlanmaTarihi': FieldValue.serverTimestamp(),
+                  'ogrenciAdi': widget.ogrenciAdi,
+                };
+
+                await Future.wait([
+                  FirebaseFirestore.instance
+                      .collection('gonderilenOdevler')
+                      .add(data),
+                  FirebaseFirestore.instance.collection('notlar').add(data),
+                  FirebaseFirestore.instance
+                      .collection('hocanınNotlarEkranı')
+                      .add(data),
+                ]);
+
+                // 2. 'bekleyenOdevler' koleksiyonundan sil
+                await FirebaseFirestore.instance
+                    .collection('bekleyenOdevler')
+                    .doc(docId)
+                    .delete();
+
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        "${odev['baslik']} ödevi tamamlandı ve gönderildi.",
+                      ),
+                      backgroundColor: Colors.green,
+                    ),
+                  );
+                }
+              } catch (e) {
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text("Bir hata oluştu: $e"),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
+              }
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF2196F3),
