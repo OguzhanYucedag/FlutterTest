@@ -4,6 +4,7 @@ import 'ev_odevleri.dart';
 import 'ogretmen_plan.dart';
 import 'ogrencilerim_list.dart';
 import 'ogrenci_istatistik.dart';
+import 'ogretmen_not.dart';
 import '../main.dart'; // For LoginPage navigation
 
 class OgretmenGirisPage extends StatelessWidget {
@@ -84,9 +85,7 @@ class OgretmenGirisPage extends StatelessWidget {
                           Container(
                             padding: const EdgeInsets.all(12),
                             decoration: BoxDecoration(
-                              color: const Color(
-                                0xFF1565C0,
-                              ).withOpacity(0.1),
+                              color: const Color(0xFF1565C0).withOpacity(0.1),
                               shape: BoxShape.circle,
                               border: Border.all(
                                 color: const Color(0xFF1565C0),
@@ -191,47 +190,6 @@ class OgretmenGirisPage extends StatelessWidget {
 
               const SizedBox(height: 32),
 
-              // Hızlı Erişim Başlığı
-              // Hızlı Erişim başlığı ve şeridi
-              // Padding(
-              //   padding: const EdgeInsets.only(left: 8.0),
-              //   child: Row(
-              //     children: [
-              //       Container(
-              //         width: 4,
-              //         height: 24,
-              //         decoration: BoxDecoration(
-              //           color: const Color(0xFF1565C0),
-              //           borderRadius: BorderRadius.circular(2),
-              //         ),
-              //       ),
-              //       const SizedBox(width: 12),
-              //       const Text(
-              //         'Hızlı Erişim',
-              //         style: TextStyle(
-              //           fontSize: 24,
-              //           fontWeight: FontWeight.w700,
-              //           color: Color(0xFF1A237E),
-              //           letterSpacing: 0.5,
-              //         ),
-              //       ),
-              //     ],
-              //   ),
-              // ),
-
-              // const SizedBox(height: 8),
-              //
-              // Padding(
-              //   padding: const EdgeInsets.only(left: 8.0),
-              //   child: Text(
-              //     'Öğretmen paneline hızlıca erişin',
-              //     style: TextStyle(fontSize: 14, color: Colors.blueGrey[600]),
-              //   ),
-              // ),
-              //
-              // const SizedBox(height: 24),
-
-              // Grid Menu
               Expanded(
                 child: GridView.count(
                   crossAxisCount: 2,
@@ -267,7 +225,8 @@ class OgretmenGirisPage extends StatelessWidget {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const EvOdevleriPage(),
+                            builder: (context) =>
+                                EvOdevleriPage(teacherName: ad),
                           ),
                         );
                       },
@@ -315,7 +274,25 @@ class OgretmenGirisPage extends StatelessWidget {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const OgrenciIstatistikPage(),
+                            builder: (context) =>
+                                OgrenciIstatistikPage(ogretmenAdi: ad),
+                          ),
+                        );
+                      },
+                    ),
+                    _buildMenuCard(
+                      icon: Icons.edit_note_rounded,
+                      label: 'Not Girişi',
+                      color: Colors.pink[700]!,
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFFF48FB1), Color(0xFFE91E63)],
+                      ),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                OgretmenNotPage(teacherName: ad),
                           ),
                         );
                       },
@@ -364,67 +341,6 @@ class OgretmenGirisPage extends StatelessWidget {
                           ),
                         );
                       },
-                    ),
-                  ],
-                ),
-              ),
-
-              // Alt Bilgi
-              Container(
-                margin: const EdgeInsets.only(top: 20, bottom: 10),
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.1),
-                      blurRadius: 10,
-                      offset: const Offset(0, -2),
-                    ),
-                  ],
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Son giriş: Bugün, 10:30',
-                      style: TextStyle(
-                        color: Colors.blueGrey[600],
-                        fontSize: 12,
-                      ),
-                    ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.green[50],
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: Colors.green[100]!),
-                      ),
-                      child: Row(
-                        children: [
-                          Container(
-                            width: 8,
-                            height: 8,
-                            decoration: BoxDecoration(
-                              color: Colors.green,
-                              shape: BoxShape.circle,
-                            ),
-                          ),
-                          const SizedBox(width: 6),
-                          Text(
-                            'Çevrimiçi',
-                            style: TextStyle(
-                              color: Colors.green[800],
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ],
-                      ),
                     ),
                   ],
                 ),
